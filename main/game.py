@@ -59,17 +59,14 @@ pg.display.set_caption("clicky clicks")
 
 
  
- 
-# def circle(display, color, x, y, radius):
-#     pg.draw.circle(display, color, [x, y], radius)
- 
+#function for adding coins if auto-miner has been bought 
 def autominer():
     global coins
     global autog
     time.sleep(0.1)
     coins = coins + autog
  
- 
+#simple text drawing 
 def DrawText(text, Textcolor, Rectcolor, x, y, fsize, shift_1 = 0, shift_2 = 0):
     font = pg.font.Font('freesansbold.ttf', fsize)
     text = font.render(text, True, Textcolor, Rectcolor)
@@ -77,10 +74,7 @@ def DrawText(text, Textcolor, Rectcolor, x, y, fsize, shift_1 = 0, shift_2 = 0):
     textRect.center = (x+shift_1, y+shift_2)
     gameDisplay.blit(text, textRect)
  
- 
-def rectangle(display, color, x, y, w, h):
-    pg.draw.rect(display, color, (x, y, w, h))
-
+#fuction that changes the image of the click-element in order to make it funny 
 def new_image_after_click(screen_f, prev_im = None):
     if prev_im != None:
         if prev_im%3 == 0:
@@ -102,7 +96,7 @@ def new_image_after_click(screen_f, prev_im = None):
 
         return blaha_muha
 
-
+#function that creates the background of button when the cursor moves above it 
 def dspl_bckgrnd_bttn(pos):
     if pos[0] >= 336 and pos[1] >= 252 and pos[0] <= 436 and pos[1] <= 352:
             gameDisplay.blit(butn_bckrnd, (display_width*0.42 - 75, display_height*0.42 - 75))
@@ -115,7 +109,7 @@ def dspl_bckgrnd_bttn(pos):
 
 
  
- 
+# main loop of our game
 def main_loop():
     global clock
     global autog
@@ -140,41 +134,26 @@ def main_loop():
             if event.type == pg.QUIT:
                 game_running = False
  
+            #here we choosing the right action depending on the cursor click place 
             if event.type == pg.MOUSEBUTTONDOWN:
                 mopos = pg.mouse.get_pos()
                 if mopos[0] >= 336 and mopos[1] >= 252 and mopos[0] <= 436 and mopos[1] <= 352:
                     coins += mong
                     current_image = new_image_after_click(gameDisplay)
-
-
-
                 elif mopos[0] >= 50 and mopos[1] >= 500 and mopos[0] <= 50+button_1.get_width() and mopos[1] <= 500+button_1.get_height():
                     if coins >= cost:
                         coins = coins - cost
                         cost = cost * 1.5
                         mong = mong * 1.1
                         cost = round(cost, 0)
-                
-
                 elif mopos[0] >= 550 and mopos[1] >= 500 and mopos[0] <= 550+button_1.get_width() and mopos[1] <= 500+button_1.get_height():
                     if coins >= cost2:
                         coins = coins - cost2
                         cost2 = cost2 * 1.5
                         autog = autog + 0.5
                         cost2 = round(cost2, 0)
-                # if mopos >= (50, 0):
-                #     if mopos <= (245, 0):
-                #         if coins >= cost2:
-                #             coins = coins - cost2
-                #             cost2 = cost2 * 1.5
-                #             autog = autog + 0.5
-                #             cost2 = round(cost2, 0)
 
-            
-        
- 
- 
- 
+        #Some code to create ruunning background(!IM LAZY BUT IT SHOULD BE MOVED TO FUNC!)
         gameDisplay.blit(bckgrnd_im,(0,0))
         gameDisplay.fill((0,0,0))
         gameDisplay.blit(bckgrnd_im,(cycle_back,0))
@@ -188,27 +167,19 @@ def main_loop():
         dspl_bckgrnd_bttn(pg.mouse.get_pos())
 
         
-        #gameDisplay.fill(light_blue)
         DrawText("ВМИК_lif(v)e", black, light_blue, 400, 100, 50)
         DrawText("you have " + str(f'{coins:.2f}') + " coins", black, light_blue, 100, 50, 20)
-        #DrawText("upgrade clicker " + str(cost), black, light_blue, 700, 300, 20)
-        #DrawText("buy auto miner " + str(cost2), black, light_blue, 150, 370, 20)
         DrawText("Version: " + ver, black, light_blue, 650, 50, 20)
 
         current_image = new_image_after_click(gameDisplay, current_image)
 
-        # rectangle(gameDisplay, blue, 50, 400, 200, 300)
-        # rectangle(gameDisplay, blue, 600, 317, 200, 300)
-
+        #displaying buttons
         gameDisplay.blit(button_1, (50, 500))
         DrawText("upgrade clicker " + str(cost), black, light_blue, 50, 500, 20, button_1.get_width()//2, button_1.get_height()//2)
-
         gameDisplay.blit(button_1, (550, 500))
         DrawText("buy auto miner " + str(cost2), black, light_blue, 550, 500, 20, button_1.get_width()//2, button_1.get_height()//2)
 
-
-        
-
+        #updating 
         pg.display.update()
         clock.tick(60)
  
