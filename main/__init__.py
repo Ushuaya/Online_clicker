@@ -2,7 +2,7 @@ from typing import Any
 import pygame as pg
 import time
 import random
-from os import path
+from os import path, listdir
 
 
 """
@@ -25,8 +25,8 @@ DISPLAY |               main_click                  |
 button_1_pos = None 
 button_2_pos = None 
 button_3_pos = None 
-DISPLAY_WIDTH = 800
-DISPLAY_HEIGHT = 600
+DISPLAY_WIDTH = 1024
+DISPLAY_HEIGHT = 768
 FPS = 60
 BLACK = (0, 0, 0)
 LIGHT_BLUE = (173, 216, 230)
@@ -56,6 +56,36 @@ class ImageUploader():
             tmp = pg.image.load(path.join(self.img_dir, name)).convert_alpha()    # if png
         tmp = pg.transform.scale(tmp, size)
         return tmp
+
+
+class MusicUploader():
+    """
+    Image uploader.
+    """ 
+    SONG_END = pg.USEREVENT + 1
+    def __init__(self, dir):
+        """ SUS.
+        """
+        self.sound_dir = path.join(path.dirname(__file__), dir)
+
+    def uploadMusic(self, name: str):
+        """Upload music from self.sound_dir folder.
+
+        params:
+            name - music name
+        returns:
+            None
+        """
+        pg.mixer.music.load(path.join(self.sound_dir, name))
+        return None
+
+    def playRandomMusic(self) -> None:
+        """Play random music from self.sound_dir folder."""
+        song_name = random.choice(listdir(self.sound_dir)) #change dir name to whatever
+        self.uploadMusic(song_name)
+        pg.mixer.music.set_volume(0.9)
+        pg.mixer.music.play(fade_ms=5000)
+        pg.mixer.music.set_endevent(self.SONG_END)
 
 
 class Drawing(): 
@@ -151,11 +181,15 @@ class Game():
         """
         Main loop of the game.
         """
-        #setting display
+        # Setting display
         gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
         pg.display.set_caption("Clicky Clicks")
 
-        #Images
+        # Music
+        musicPlayer = MusicUploader('music')
+        musicPlayer.playRandomMusic()
+
+        # Images
         imageSaver = ImageUploader('images')
         vmkLogo = imageSaver.uploadImage('click_logo.png', (0.125 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
         msuLogo = imageSaver.uploadImage('msu_logo.png', (0.125 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
@@ -167,15 +201,13 @@ class Game():
         butn_bckrnd = imageSaver.uploadImage('button_back_3.png', (0.32 * DISPLAY_WIDTH, 0.42 * DISPLAY_HEIGHT))
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
         
-        #Ininial values
+        # Ininial values
         running = True
         shiftBackgoungnd = ShiftingBackgoungnd() 
         Drawer = Drawing()
 
-        #Start
-        
+        # Start
         clock = pg.time.Clock()
-
         while running:
             clock.tick(FPS)
             self.autominer()
@@ -183,9 +215,14 @@ class Game():
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running = False
-    
+                    continue
+                
+                # If current music ends
+                elif event.type == musicPlayer.SONG_END:
+                    musicPlayer.playRandomMusic()
+
                 # Here we choose the right action depending on the cursor click place 
-                if event.type == pg.MOUSEBUTTONDOWN:
+                elif event.type == pg.MOUSEBUTTONDOWN:
                     mopos = pg.mouse.get_pos()
                     # if click for score
                     if mopos[0] >= DISPLAY_WIDTH * 0.42 and mopos[1] >= DISPLAY_HEIGHT * 0.42 and\
