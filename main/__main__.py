@@ -1,5 +1,5 @@
 import pygame as pg
-from __init__ import Game
+from . import Game
 
 if __name__ == "__main__":
     pg.init()
