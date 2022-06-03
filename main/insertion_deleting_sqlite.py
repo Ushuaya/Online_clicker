@@ -14,23 +14,67 @@ API_TOKEN = token_crypto
 
 bot = telebot.TeleBot(API_TOKEN)
 
-@bot.message_handler(commands = ["start"])
-def start(messg): 
+@bot.message_handler(commands = ["register"])
+def register(messg): 
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS login_id(id INTEGER)") 
+    cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
     connect.commit() 
-    people_id = messg.chat.id 
-    cursor.execute(f"SELECT id FROM login_id WHERE id = {people_id}")
-    people_id_data = cursor.fetchone() 
-    bot.send_message(messg.chat.id, "Type \"/find\" to start search of porch lock-code")
+    # people_id = messg.chat.id 
+    # cursor.execute(f"SELECT id FROM login_id WHERE id = {people_id}")
+    #people_id_data = cursor.fetchone() 
+    #bot.send_message(messg.chat.id, "Type \"/find\" to start search of porch lock-code")
 
-    if people_id_data is None: 
-        user_id = [messg.chat.id]
-        cursor.execute("INSERT INTO login_id VALUES(?);", user_id)
+    #регистрация
+    print("Регистрация: ")
+    username_in = str(input("username: "))
+    user_id = [messg.chat.id]
+    cursor.execute(f"SELECT username FROM login_id WHERE username = ?", (username_in,))
+    name_out = cursor.fetchone()
+    if name_out is None: 
+        password_in = str(input("password: "))
+        cursor.execute("INSERT INTO login_id (id, username, password) VALUES (?, ?, ?);", (user_id[0], username_in, password_in))
         connect.commit() 
+        print("Done")
     else: 
-        bot.send_message(messg.chat.id, "Уже есть такой")
+        print("Same user also exists...")
+
+
+@bot.message_handler(commands = ["sighin"])
+def sighin(messg): 
+
+    connect = sqlite3.connect('users.db')
+    cursor = connect.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS login_id(id INTEGER, username CHAR, password CHAR);") 
+    connect.commit() 
+    # people_id = messg.chat.id 
+    # cursor.execute(f"SELECT id FROM login_id WHERE id = {people_id}")
+    #people_id_data = cursor.fetchone() 
+    #bot.send_message(messg.chat.id, "Type \"/find\" to start search of porch lock-code")
+
+    #вход с логином и паролем
+    username_in = str(input("username: "))
+    cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
+    name_out = cursor.fetchone()
+    if name_out is None: 
+        bot.send_message(messg.chat.id, "Вы ещё не регестрировались.")
+        print("Вы ещё не регестрировались.")
+    else: 
+        password_in = str(input("password: "))
+        if name_out[1] == password_in:
+            print("Вы успешно вошли")
+            #...
+        else: 
+            print("Пароль неверный")
+
+    #
+
+    # if people_id_data is None: 
+    #     user_id = [messg.chat.id]
+    #     cursor.execute("INSERT INTO login_id VALUES(?);", user_id)
+    #     connect.commit() 
+    # else: 
+    #     bot.send_message(messg.chat.id, "Уже есть такой")
 
 # @bot.message_handler(commands = ["find"])
 # def start(messg): 
@@ -44,9 +88,6 @@ def listener(messages):
     print(type(messages[0].de_json))
     #print(dir(messages[0].de_json))
     #print(messages[0].de_json())
-
-
-bot.set_update_listener(listener)
 
 
 
@@ -72,4 +113,6 @@ def delete(messg):
     
     connect.commit() 
 
+
+bot.set_update_listener(listener)
 bot.polling()
