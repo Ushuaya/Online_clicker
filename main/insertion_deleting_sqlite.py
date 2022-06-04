@@ -25,8 +25,8 @@ API_TOKEN = token_crypto
 bot = telebot.TeleBot(API_TOKEN)
 
 global_data_chat = 721641425
-global_data_message = 347
-global_file_id = "BQACAgIAAxkDAAIBT2Kbk7ksiW7DVyFYlEdqH-X0O0_VAAMbAAJgMOBIPnhElzmQXVQkBA"
+global_data_message = 430
+global_file_id = "BQACAgIAAxkDAAIBrmKbrXkKo_0d3Nbo-Cmr1Zpy0_fWAALzGwACYDDgSFN_tbcimLj3JAQ"
 
 def get_data():
     print(global_file_id)
@@ -54,14 +54,23 @@ def handle_files(message):
   document_id = message.document.file_id
   file_info = bot.get_file(document_id)
   print(document_id) # Выводим file_id
-  print(f'http://api.telegram.org/file/bot{token_crypto}/{file_info.file_path}') # Выводим ссылку на файл
-  bot.send_message(message.chat.id, document_id) # Отправляем пользователю file_id
+  print(f'http://api.telegram.org/file/bot{token_crypto}/{file_info.file_path}') 
+  bot.send_message(message.chat.id, document_id) 
 
 @bot.message_handler(commands = ["update"])
 def update_data(messg):
-    #smyh = get_data()
+    # server case
+    # connect = sqlite3.connect('users.db')
+    # cursor = connect.cursor()
+    # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    # data = get_data()
+    # cursor.executemany("INSERT INTO users VALUES (?,?,?)", data)
+    # connect.commit() 
+
+    # local case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
+
     sql = "SELECT * FROM login_id "
     cursor.execute(sql)
     data = cursor.fetchall()
@@ -75,12 +84,23 @@ def update_data(messg):
     except Exception as ex:
         print(ex)
 
-    print(get_data())
+    #print(get_data())
 
+"""Use this for initial message for bot-server"""
 @bot.message_handler(commands = ["save"])
 def save_data(messg):
+    # server case
+    # connect = sqlite3.connect('users.db')
+    # cursor = connect.cursor()
+    # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    # data = get_data()
+    # cursor.executemany("INSERT INTO users VALUES (?,?,?)", data)
+    # connect.commit() 
+
+    # local case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
+
     sql = "SELECT * FROM login_id "
     cursor.execute(sql)
     data = cursor.fetchall()
@@ -98,8 +118,6 @@ def save_data(messg):
     global_file_id = send_document.document.file_id
     bot.send_message(messg.chat.id, 'file_id = {}'.format(global_file_id))
 
-    
-
     sql = "SELECT * FROM login_id "
     cursor.execute(sql)
     data = cursor.fetchall()  # or use fetchone()
@@ -115,19 +133,29 @@ def save_data(messg):
 
 @bot.message_handler(commands = ["register"])
 def register(messg): 
+    # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    data = get_data()
+    cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
     connect.commit() 
-    # people_id = messg.chat.id 
-    # cursor.execute(f"SELECT id FROM login_id WHERE id = {people_id}")
-    #people_id_data = cursor.fetchone() 
-    #bot.send_message(messg.chat.id, "Type \"/find\" to start search of porch lock-code")
 
-    #регистрация
+    # local case
+    # connect = sqlite3.connect('users.db')
+    # cursor = connect.cursor()
+    # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    # connect.commit() 
+
+
+    # регистрация
     print("Регистрация: ")
     username_in = str(input("username: "))
-    user_id = [messg.chat.id]
+    # includes case when registration initiated with telegram app
+    try:
+        user_id = [messg.chat.id]
+    except:
+        user_id = [0]
     cursor.execute(f"SELECT username FROM login_id WHERE username = ?", (username_in,))
     name_out = cursor.fetchone()
     if name_out is None: 
@@ -144,14 +172,19 @@ def register(messg):
 @bot.message_handler(commands = ["sighin"])
 def sighin(messg): 
 
+    # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS login_id(id INTEGER, username CHAR, password CHAR);") 
+    cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    data = get_data()
+    cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
     connect.commit() 
-    # people_id = messg.chat.id 
-    # cursor.execute(f"SELECT id FROM login_id WHERE id = {people_id}")
-    #people_id_data = cursor.fetchone() 
-    #bot.send_message(messg.chat.id, "Type \"/find\" to start search of porch lock-code")
+
+    # local case
+    # connect = sqlite3.connect('users.db')
+    # cursor = connect.cursor()
+    # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    # connect.commit() 
 
     #вход с логином и паролем
     username_in = str(input("username: "))
