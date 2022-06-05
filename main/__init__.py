@@ -28,6 +28,9 @@ DISPLAY_HEIGHT = 768
 FPS = 60
 BLACK = (0, 0, 0)
 LIGHT_BLUE = (173, 216, 230)
+GREEN = (0, 255, 0)
+WHITE = (255,255,255)
+RED = (255,0,0)
 
 
 class ImageUploader():
@@ -75,12 +78,21 @@ class MusicUploader():
 
     def playRandomMusic(self) -> None:
         """Play random music from self.sound_dir folder."""
-        song_name = random.choice(listdir(self.sound_dir)) #change dir name to whatever
+        song_name = random.choice(listdir(self.sound_dir))
         self.uploadMusic(song_name)
-        pg.mixer.music.set_volume(0.9)
+        pg.mixer.music.set_volume(0.5)
         pg.mixer.music.play(fade_ms=5000)
         pg.mixer.music.set_endevent(self.SONG_END)
 
+    def setVolume(self, v: int) -> None:
+        """Set music volume to v."""
+        if 0 < v <= 1:
+            pg.mixer.music.set_volume(v)
+        elif v <= 0:
+            pg.mixer.music.set_volume(0)
+        elif v > 1:
+            pg.mixer.music.set_volume(1)
+        return
 
 class Drawing(): 
 
@@ -123,15 +135,15 @@ class Drawing():
            pos[0] <= DISPLAY_WIDTH * 0.545 and pos[1] <= DISPLAY_HEIGHT * 0.59:
             screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * (0.42 - 0.1), DISPLAY_HEIGHT * (0.42 - 0.125)))
 
-        if pos[0] >= DISPLAY_WIDTH * 0.0625 and pos[1] >= DISPLAY_HEIGHT * 0.84 and\
-           pos[0] <= DISPLAY_WIDTH * 0.0625 + button_f.get_width() and pos[1] <= DISPLAY_HEIGHT * 0.84 + button_f.get_height():
-            screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * 0.0625 + button_f.get_width() // 2 - button_bckgrnd_f.get_width() // 2, 
-                                             DISPLAY_HEIGHT * 0.82 + button_f.get_height() // 2 - button_bckgrnd_f.get_height() // 2))
+        #if pos[0] >= DISPLAY_WIDTH * 0.0625 and pos[1] >= DISPLAY_HEIGHT * 0.84 and\
+        #   pos[0] <= DISPLAY_WIDTH * 0.0625 + button_f.get_width() and pos[1] <= DISPLAY_HEIGHT * 0.84 + button_f.get_height():
+        #    screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * 0.0625 + button_f.get_width() // 2 - button_bckgrnd_f.get_width() // 2, 
+        #                                     DISPLAY_HEIGHT * 0.82 + button_f.get_height() // 2 - button_bckgrnd_f.get_height() // 2))
 
-        if pos[0] >= DISPLAY_WIDTH * 0.6875 and pos[1] >= DISPLAY_HEIGHT * 0.84 and\
-           pos[0] <= DISPLAY_WIDTH * 0.6875 + button_f.get_width() and pos[1] <= DISPLAY_HEIGHT * 0.84 + button_f.get_height():
-            screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * 0.6875 + button_f.get_width() // 2 - button_bckgrnd_f.get_width() // 2,
-                          DISPLAY_HEIGHT * 0.82 + button_f.get_height() // 2 - button_bckgrnd_f.get_height() // 2))
+        #if pos[0] >= DISPLAY_WIDTH * 0.6875 and pos[1] >= DISPLAY_HEIGHT * 0.84 and\
+        #   pos[0] <= DISPLAY_WIDTH * 0.6875 + button_f.get_width() and pos[1] <= DISPLAY_HEIGHT * 0.84 + button_f.get_height():
+        #    screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * 0.6875 + button_f.get_width() // 2 - button_bckgrnd_f.get_width() // 2,
+        #                  DISPLAY_HEIGHT * 0.82 + button_f.get_height() // 2 - button_bckgrnd_f.get_height() // 2))
 
 
 class ShiftingBackgoungnd(): 
@@ -176,9 +188,16 @@ class Game():
         clickImages = (vmkLogo, msuLogo, sadLogo)
         currLogo = msuLogo
 
-        button_1 = imageSaver.uploadImage('button_1.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
-        butn_bckrnd = imageSaver.uploadImage('button_back_3.png', (0.32 * DISPLAY_WIDTH, 0.42 * DISPLAY_HEIGHT))
+        button_1 = imageSaver.uploadImage('button_upgrade.png', (0.33 * DISPLAY_WIDTH, 0.13 * DISPLAY_HEIGHT))
+        butn_bckrnd = imageSaver.uploadImage('button_back.png', (0.32 * DISPLAY_WIDTH, 0.42 * DISPLAY_HEIGHT))
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
+        UPGRADE_BUTTON = Button(button_1, pos=(0.20 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
+                                text_input="Upgrade clicker: {}".format(self.costUpgrade), font_size=20, 
+                                hovering_color=GREEN)
+        AUTOMINER_BUTTON = Button(button_1, pos=(0.80 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
+                                  text_input="Upgrade autominer: {}".format(self.costAutominer), font_size=20, 
+                                  hovering_color=GREEN)
         
         # Ininial values
         shiftBackgoungnd = ShiftingBackgoungnd() 
@@ -189,8 +208,10 @@ class Game():
         while self.running:
             clock.tick(FPS)
             self.autominer()
-
+            
+            MOUSE_POS = pg.mouse.get_pos()
             for event in pg.event.get():
+
                 if event.type == pg.QUIT:
                     self.running = False
                     continue
@@ -201,33 +222,36 @@ class Game():
 
                 # Here we choose the right action depending on the cursor click place 
                 elif event.type == pg.MOUSEBUTTONDOWN:
-                    mopos = pg.mouse.get_pos()
+                    #MOUSE_POS = pg.mouse.get_pos()
                     # if click for score
-                    if mopos[0] >= DISPLAY_WIDTH * 0.42 and mopos[1] >= DISPLAY_HEIGHT * 0.42 and\
-                       mopos[0] <= DISPLAY_WIDTH * 0.545 and mopos[1] <= DISPLAY_HEIGHT * 0.59:
+                    if MOUSE_POS[0] >= DISPLAY_WIDTH * 0.42 and MOUSE_POS[1] >= DISPLAY_HEIGHT * 0.42 and\
+                       MOUSE_POS[0] <= DISPLAY_WIDTH * 0.545 and MOUSE_POS[1] <= DISPLAY_HEIGHT * 0.59:
                         self.coins += self.mong
                         currLogo = Drawer.newImageAfterClick(clickImages)
 
                     # if click for upgrade
-                    elif mopos[0] >= DISPLAY_WIDTH * 0.0625 and DISPLAY_HEIGHT * 0.84 and\
-                         mopos[0] <= DISPLAY_WIDTH * 0.42 + button_1.get_width() and\
-                         mopos[1] <= DISPLAY_HEIGHT * 0.84 + button_1.get_height():
+                    elif UPGRADE_BUTTON.checkForInput(MOUSE_POS):
                         if self.coins >= self.costUpgrade:
                             self.coins = self.coins - self.costUpgrade
                             self.mong = self.mong * 1.1
                             self.costUpgrade = round(self.costUpgrade * 1.5, 0)
+                            UPGRADE_BUTTON.changeText("Upgrade clicker: {}".format(self.costUpgrade))
 
                     # if click for autominer
-                    elif mopos[0] >= DISPLAY_WIDTH * 0.6875 and mopos[1] >= DISPLAY_HEIGHT * 0.84 and\
-                         mopos[0] <= DISPLAY_WIDTH * 0.6875 + button_1.get_width() and\
-                         mopos[1] <= DISPLAY_HEIGHT * 0.84 + button_1.get_height():
+                    elif AUTOMINER_BUTTON.checkForInput(MOUSE_POS):
                         if self.coins >= self.costAutominer:
                             self.coins = self.coins - self.costAutominer
                             self.autog = self.autog + 0.5
                             self.costAutominer = round(self.costAutominer * 1.5, 0)
+                            AUTOMINER_BUTTON.changeText("Upgrade autominer: {}".format(self.costAutominer))
+
 
             # Func to create dynamic background
             shiftBackgoungnd.shift(self.gameDisplay, bckgrnd_im, DISPLAY_WIDTH)
+
+            for button in [UPGRADE_BUTTON, AUTOMINER_BUTTON]:
+                button.changeColor(MOUSE_POS)
+                button.update(self.gameDisplay)
 
             Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, button_1, butn_bckrnd)
             self.gameDisplay.blit(currLogo, (DISPLAY_WIDTH * 0.42, DISPLAY_HEIGHT * 0.42))
@@ -239,6 +263,7 @@ class Game():
             Drawer.drawText("Version: " + self.ver, BLACK, LIGHT_BLUE, 
                             0.85 * DISPLAY_WIDTH, 0.06 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
 
+            """
             #displaying buttons
             self.gameDisplay.blit(button_1, (0.065 * DISPLAY_WIDTH, 0.80 * DISPLAY_HEIGHT))
             Drawer.drawText("Upgrade clicker: " + str(self.costUpgrade), BLACK, LIGHT_BLUE, 
@@ -248,7 +273,7 @@ class Game():
             Drawer.drawText("Buy auto miner: " + str(self.costAutominer), BLACK, LIGHT_BLUE, 
                             0.69 * DISPLAY_WIDTH, 0.80 * DISPLAY_HEIGHT, 20, 
                             button_1.get_width() // 2, button_1.get_height() // 2, self.gameDisplay)
-
+            """
             #updating 
             pg.display.flip()
         return
@@ -259,17 +284,28 @@ class Game():
     def main_menu(self) -> None:
         """Main menu screen."""
         pg.display.set_caption("Menu")
+
         imageSaver = ImageUploader('images')
-        button_1 = imageSaver.uploadImage('button_1.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+        button_dark_blue = imageSaver.uploadImage('button_dark_blue.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+        button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
         font_name = "freesansbold.ttf" 
         font_size = 120
-        MENU_TEXT = pg.font.Font(font_name, font_size).render("SUS", True, BLACK)
-        PLAY_BUTTON = Button(button_1, pos=(640, 250), text_input="PLAY", font_size=75)
-        OPTIONS_BUTTON = Button(button_1, pos=(640, 400), text_input="OPTIONS", font_size=75)
-        QUIT_BUTTON = Button(button_1, pos=(640, 550), text_input="QUIT", font_size=75)
-        MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
+        MENU_TEXT = pg.font.Font(font_name, font_size).render("CLICKER HEHE", True, BLACK)
+        MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.13 * DISPLAY_HEIGHT))
+        
+        PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT), 
+                             text_input="PLAY", font_size=48)
+        OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.55 * DISPLAY_HEIGHT), 
+                                text_input="OPTIONS", font_size=48)
+        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.77 * DISPLAY_HEIGHT), 
+                             text_input="QUIT", font_size=48, hovering_color=BLACK)
+        
+        clock = pg.time.Clock()
         while self.running:
+            clock.tick(FPS)
+
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
@@ -291,7 +327,8 @@ class Game():
                         self.running = False
                         continue
 
-            pg.display.update()
+            pg.display.flip()
+        return
 
     def __init__(self) -> None:
         """Start the game."""

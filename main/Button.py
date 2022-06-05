@@ -24,7 +24,7 @@ class Button():
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 
-    def update(self, screen: Surface):
+    def update(self, screen: Surface) -> None:
         """Update button image."""
         if self.image is not None:
             screen.blit(self.image, self.rect)
@@ -35,7 +35,12 @@ class Button():
         return self.rect.left <= position[0] <= self.rect.right and\
                self.rect.top <= position[1] <= self.rect.bottom
 
-    def changeColor(self, position: tuple[int]):
+    def changeText(self, new_text: str) -> None:
+        self.text_input = new_text
+        self.text = self.font.render(self.text_input, True, self.base_color)
+        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+    def changeColor(self, position: tuple[int]) -> None:
         """Change button's text color if position in button's range."""
         if self.checkForInput(position):
             self.text = self.font.render(self.text_input, True, self.hovering_color)
