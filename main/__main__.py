@@ -4,5 +4,5 @@ from . import Game
 if __name__ == "__main__":
     pg.init()
     pg.mixer.init()
-    Game().main_loop()
+    Game()
     pg.quit()
