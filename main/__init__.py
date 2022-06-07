@@ -25,6 +25,7 @@ DISPLAY |               main_click                  |
 button_1_pos = None 
 button_2_pos = None 
 button_3_pos = None 
+
 DISPLAY_WIDTH = 1024
 DISPLAY_HEIGHT = 768
 FPS = 60

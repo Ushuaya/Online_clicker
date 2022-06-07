@@ -1,3 +1,5 @@
+"""D"""
+
 import sqlite3
 #from matplotlib.pyplot import text
 #import pandas
@@ -132,7 +134,7 @@ def save_data(messg):
         print(ex)
 
 @bot.message_handler(commands = ["register"])
-def register(messg): 
+def register(messg, username_in = None, password_in = None): 
     # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
@@ -150,23 +152,40 @@ def register(messg):
 
     # регистрация
     print("Регистрация: ")
-    username_in = str(input("username: "))
+    if username_in == None:
+        username_in = str(input("username: "))
+
     # includes case when registration initiated with telegram app
     try:
         user_id = [messg.chat.id]
     except:
         user_id = [0]
+
     cursor.execute(f"SELECT username FROM login_id WHERE username = ?", (username_in,))
     name_out = cursor.fetchone()
     if name_out is None: 
-        password_in = str(input("password: "))
+        if password_in == None: 
+            password_in = str(input("password: "))
         cursor.execute("INSERT INTO login_id (id, username, password) VALUES (?, ?, ?);", (user_id[0], username_in, password_in))
         connect.commit() 
         print("Done")
+        update_data(None)
+        cursor.execute("SELECT id, username FROM login_id ORDER BY id DESC LIMIT 10;") 
+        results_10 = cursor.fetchall()
+        #cursor.execute(f"SELECT ROW_NUMBER() over(ORDER BY id DESC) num, id, username FROM login_id  WHERE username = (?) ORDER BY username;", (username_in,))
+        cursor.execute("SELECT id, username, ROW_NUMBER() over(ORDER BY id DESC) AS Row FROM login_id;")
+        #cursor.executemany("SELECT id, username, Row FROM login_id WHERE username = (?);", (username_in,))
+
+        user_place = cursor.fetchall()
+        user_place = [i for i in user_place if i[1] == username_in]
+        #connect.commit() 
+        #cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
+        return results_10, user_place
     else: 
         print("Same user also exists...")
+        return None, None
 
-    update_data(None)
+    
 
 
 @bot.message_handler(commands = ["sighin"])
