@@ -6,7 +6,7 @@ from .Button import Button
 from os import path, listdir
 
 
-"""
+""" Play screen:
                         DISPLAY WIDTH
         |-------------------------------------------|
         |                                           |
@@ -93,6 +93,7 @@ class MusicUploader():
         elif v > 1:
             pg.mixer.music.set_volume(1)
         return
+
 
 class Drawing(): 
 
@@ -263,17 +264,6 @@ class Game():
             Drawer.drawText("Version: " + self.ver, BLACK, LIGHT_BLUE, 
                             0.85 * DISPLAY_WIDTH, 0.06 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
 
-            """
-            #displaying buttons
-            self.gameDisplay.blit(button_1, (0.065 * DISPLAY_WIDTH, 0.80 * DISPLAY_HEIGHT))
-            Drawer.drawText("Upgrade clicker: " + str(self.costUpgrade), BLACK, LIGHT_BLUE, 
-                            0.065 * DISPLAY_WIDTH, 0.80 * DISPLAY_HEIGHT, 20, 
-                            button_1.get_width() // 2, button_1.get_height() // 2, self.gameDisplay)
-            self.gameDisplay.blit(button_1, (0.69 * DISPLAY_WIDTH, 0.80 * DISPLAY_HEIGHT))
-            Drawer.drawText("Buy auto miner: " + str(self.costAutominer), BLACK, LIGHT_BLUE, 
-                            0.69 * DISPLAY_WIDTH, 0.80 * DISPLAY_HEIGHT, 20, 
-                            button_1.get_width() // 2, button_1.get_height() // 2, self.gameDisplay)
-            """
             #updating 
             pg.display.flip()
         return
