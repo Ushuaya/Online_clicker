@@ -189,7 +189,7 @@ def register(messg, username_in = None, password_in = None):
 
 
 @bot.message_handler(commands = ["sighin"])
-def sighin(messg): 
+def sighin(messg, username_in = None, password_in = None): 
 
     # server case
     connect = sqlite3.connect('users.db')
@@ -206,19 +206,38 @@ def sighin(messg):
     # connect.commit() 
 
     #вход с логином и паролем
-    username_in = str(input("username: "))
+    if username_in == None or username_in == "":
+        #User didn't specify username
+        return 4, None
+        username_in = str(input("username: "))
     cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
     name_out = cursor.fetchone()
     if name_out is None: 
-        bot.send_message(messg.chat.id, "Вы ещё не регестрировались.")
-        print("Вы ещё не регестрировались.")
+        #bot.send_message(messg.chat.id, "Вы ещё не регестрировались.")
+        return 1, None
     else: 
-        password_in = str(input("password: "))
+        if password_in == None or password_in == "":
+            #Пароль не введён
+            return 2, None
+            #password_in = str(input("password: "))
+
         if name_out[1] == password_in:
-            print("Вы успешно вошли")
+            #"Вы успешно вошли")
             #...
+            cursor.execute("SELECT id, username FROM login_id ORDER BY id DESC LIMIT 10;") 
+            results_10 = cursor.fetchall()
+            #cursor.execute(f"SELECT ROW_NUMBER() over(ORDER BY id DESC) num, id, username FROM login_id  WHERE username = (?) ORDER BY username;", (username_in,))
+            cursor.execute("SELECT id, username, ROW_NUMBER() over(ORDER BY id DESC) AS Row FROM login_id;")
+            #cursor.executemany("SELECT id, username, Row FROM login_id WHERE username = (?);", (username_in,))
+
+            user_place = cursor.fetchall()
+            user_place = [i for i in user_place if i[1] == username_in]
+            #connect.commit() 
+            #cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
+            return results_10, user_place
         else: 
-            print("Пароль неверный")
+            #Wrong password
+            return 3, None
 
     #
 
