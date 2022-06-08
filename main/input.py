@@ -1,6 +1,3 @@
-from unittest import result
-
-#from numpy import _FlatIterSelf
 import pygame as pg
 from insertion_deleting_sqlite import register, sighin
 from __init__ import Drawing, ImageUploader
