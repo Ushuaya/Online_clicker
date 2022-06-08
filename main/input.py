@@ -10,8 +10,6 @@ DISPLAY_HEIGHT = 480
 
 
 
-
-
 pg.init()
 screen = pg.display.set_mode((640, 480))
 pg.display.set_caption("Inputer")
@@ -77,7 +75,9 @@ def main():
     clock = pg.time.Clock()
     input_box1 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.28, 140, 32)
     input_box2 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.48, 140, 32)
+    input_box3 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.68, 140, 32)
     input_boxes = [input_box1, input_box2]
+    input_boxes_registration = [input_box1, input_box2, input_box3]
     done = False
     Drawer2 = Drawing()
 
@@ -141,7 +141,10 @@ def main():
                             mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
                             #done = not done
                             #print("There ate not empty: ", input_boxes[0].text, input_boxes[1].text)
-                            table_10, pos = register(None, input_boxes[0].text, input_boxes[1].text)
+                            if input_boxes_registration[1].text == input_boxes_registration[2].text:
+                                table_10, pos = register(None, input_boxes_registration[0].text, input_boxes_registration[1].text)
+                            else:
+                                table_10 = 4
                             #print(table_10, "\n", pos[0])
                             
 
@@ -156,6 +159,9 @@ def main():
                                 case 3: 
                                     wrong_inp = True
                                     Error_msg = "User with same also exists..."
+                                case 4: 
+                                    wrong_inp = True
+                                    Error_msg = "Passwords are not equaol..."
                                 case _: 
                                     wrong_inp = False
                                     Error_msg = ""
@@ -168,16 +174,16 @@ def main():
                             done = not done 
                             Next_stage = "REG_SIGN"
 
-                    for i in range(len(input_boxes)):
-                        frog = input_boxes[i].handle_event(event)
+                    for i in range(len(input_boxes_registration)):
+                        frog = input_boxes_registration[i].handle_event(event)
                         if frog != None: 
                             print(frog)
 
-                for box in input_boxes:
+                for box in input_boxes_registration:
                     box.update()
 
                 screen.fill((30, 30, 30))
-                for box in input_boxes:
+                for box in input_boxes_registration:
                     box.draw(screen)
 
                 Drawer2.drawText("Username: " , (0, 0, 0), (100, 110, 110), 
@@ -185,6 +191,9 @@ def main():
                 
                 Drawer2.drawText("Password: " , (0, 0, 0), (100, 110, 110), 
                                     DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.5, 20, screen = screen)
+                
+                Drawer2.drawText("Password again: " , (0, 0, 0), (100, 110, 110), 
+                                    DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.7, 20, screen = screen)
 
 
                 screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))

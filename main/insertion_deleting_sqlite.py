@@ -32,11 +32,11 @@ global_data_message = 430
 global_file_id = "BQACAgIAAxkDAAIBrmKbrXkKo_0d3Nbo-Cmr1Zpy0_fWAALzGwACYDDgSFN_tbcimLj3JAQ"
 
 def get_data():
-    # Very strange procedure, but it is necessary, in oreder to get new file id from message (API doesn't support message return by its id withount such manipulations)
+    # Very strange procedure, but it is necessary, in order to get new file id from message (API doesn't support message return by its id withount such manipulations)
     try: 
-        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current database").document.file_id
+        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current database"))).document.file_id
     except: 
-        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current Database").document.file_id
+        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current Database"))).document.file_id
     print(global_file_id)
 
     file_data = bot.get_file(global_file_id)
@@ -80,6 +80,7 @@ def update_data(messg):
     cursor = connect.cursor()
 
     sql = "SELECT * FROM login_id "
+    cursor.execute(f"DELETE FROM login_id WHERE id = 721641425")
     cursor.execute(sql)
     data = cursor.fetchall()
     str_data = json.dumps(data)
@@ -167,7 +168,7 @@ def register(messg, username_in = None, password_in = None):
     try:
         user_id = [messg.chat.id]
     except:
-        user_id = [random.randint(0, 999999999)]
+        user_id = [random.randint(0, 9999)]
 
     cursor.execute(f"SELECT username FROM login_id WHERE username = ?", (username_in,))
     name_out = cursor.fetchone()
