@@ -30,6 +30,7 @@ class InputBox:
         self.txt_surface = FONT.render(text, True, self.color)
         self.active = False
         self.print = ""
+        self.password = False
 
     def handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -46,14 +47,15 @@ class InputBox:
                 if event.key == pg.K_RETURN:
                     self.print = self.text
                     self.text = ''
-                    #self.txt_surface = FONT.render(self.text, True, self.color)
+                    self.txt_surface = FONT.render("*"*len(self.text) if self.password == True else self.text, True, self.color)  
                     return self.print
                 elif event.key == pg.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:
-                    self.text += event.unicode
+                    if event.unicode != " ":
+                        self.text += event.unicode
                 # Re-render the text.
-                self.txt_surface = FONT.render(self.text, True, self.color)
+                self.txt_surface = FONT.render("*"*len(self.text) if self.password == True else self.text, True, self.color)
         
 
     def update(self):
@@ -75,7 +77,9 @@ def main():
     clock = pg.time.Clock()
     input_box1 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.28, 140, 32)
     input_box2 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.48, 140, 32)
+    input_box2.password = True
     input_box3 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.68, 140, 32)
+    input_box3.password = True
     input_boxes = [input_box1, input_box2]
     input_boxes_registration = [input_box1, input_box2, input_box3]
     done = False
