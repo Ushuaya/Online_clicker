@@ -32,7 +32,13 @@ global_data_message = 430
 global_file_id = "BQACAgIAAxkDAAIBrmKbrXkKo_0d3Nbo-Cmr1Zpy0_fWAALzGwACYDDgSFN_tbcimLj3JAQ"
 
 def get_data():
+    # Very strange procedure, but it is necessary, in oreder to get new file id from message (API doesn't support message return by its id withount such manipulations)
+    try: 
+        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current database").document.file_id
+    except: 
+        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current Database").document.file_id
     print(global_file_id)
+
     file_data = bot.get_file(global_file_id)
     print("ok")
     # Получаем файл по url
@@ -77,11 +83,14 @@ def update_data(messg):
     cursor.execute(sql)
     data = cursor.fetchall()
     str_data = json.dumps(data)
+    print("data to send:\n", str_data)
     admin_id = global_data_chat
     config_id = global_data_message
     try:
         # Обновляем  наш файл с данными
-        bot.edit_message_media(chat_id  = global_data_chat, message_id = global_data_message, media = telebot.types.InputMediaDocument(io.StringIO(str_data)))
+        edit_file = bot.edit_message_media(chat_id  = global_data_chat, message_id = global_data_message, media = telebot.types.InputMediaDocument(io.StringIO(str_data)))
+        global global_file_id
+        global_file_id = edit_file.document.file_id
 
     except Exception as ex:
         print(ex)
@@ -124,10 +133,7 @@ def save_data(messg):
     cursor.execute(sql)
     data = cursor.fetchall() 
     try:
-        # Переводим словарь в строку
         str_data=json.dumps(data)
-
-        # Обновляем  наш файл с данными
         bot.edit_message_media(chat_id  = admin_id, message_id = config_id, media = telebot.types.InputMediaDocument(io.StringIO(str_data)))
 
     except Exception as ex:
@@ -138,8 +144,10 @@ def register(messg, username_in = None, password_in = None):
     # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
+    cursor.execute("DROP TABLE login_id;")
     cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
     data = get_data()
+    print(data)
     cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
     connect.commit() 
 
@@ -194,8 +202,10 @@ def sighin(messg, username_in = None, password_in = None):
     # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
+    cursor.execute("DROP TABLE login_id;")
     cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
     data = get_data()
+    print(data)
     cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
     connect.commit() 
 
