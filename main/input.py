@@ -1,4 +1,6 @@
 from unittest import result
+
+#from numpy import _FlatIterSelf
 import pygame as pg
 from insertion_deleting_sqlite import register, sighin
 from __init__ import Drawing, ImageUploader
@@ -70,10 +72,6 @@ class InputBox:
 
 
 
-
-
-
-
 def main():
     print("ok")
     clock = pg.time.Clock()
@@ -84,190 +82,249 @@ def main():
     Drawer2 = Drawing()
 
     # step one 
-    Next_stage = ""
-    while not done:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                done = True
+    Next_stage = "REG_SIGN"
+    done = False
+    exit_module = False
 
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                    mopos = pg.mouse.get_pos()
+    while not exit_module:
+        if Next_stage == "REG_SIGN":
+            done = not done 
+            while not done:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        done = True
+                        exit_module = True
 
-                    if  mopos[0] >= DISPLAY_WIDTH * 0.1 and mopos[1] >= DISPLAY_HEIGHT * 0.1 and\
-                        mopos[0] <= DISPLAY_WIDTH * 0.1 + button_1.get_width() and\
-                        mopos[1] <= DISPLAY_HEIGHT * 0.1 + button_1.get_height():
-                        Next_stage = "REGISTRATION"
-                        done = not done
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                            mopos = pg.mouse.get_pos()
 
-                    elif mopos[0] >= DISPLAY_WIDTH * 0.6 and mopos[1] >= DISPLAY_HEIGHT * 0.1 and\
-                        mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
-                        mopos[1] <= DISPLAY_HEIGHT * 0.1 + button_1.get_height():
-                        Next_stage = "SIGN_IN"
-                        done = not done
-
-            
-        screen.fill((30, 30, 30))
-        screen.blit(button_1, (DISPLAY_WIDTH*0.1, 0.1 * DISPLAY_HEIGHT))
-        Drawer2.drawText("Registration" , (0, 0, 0), None, 
-                            DISPLAY_WIDTH*0.25, 0.16 * DISPLAY_HEIGHT, 20, screen = screen)
-        screen.blit(button_1, (DISPLAY_WIDTH*0.6, 0.1 * DISPLAY_HEIGHT))
-        Drawer2.drawText("Sign in" , (0, 0, 0), None, 
-                            DISPLAY_WIDTH*0.75, 0.16 * DISPLAY_HEIGHT, 20, screen = screen)
-
-        pg.display.flip()
-
-    done = not done
-    if Next_stage == "REGISTRATION":
-        wrong_inp = False
-        while not done:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    done = True
-
-                elif event.type == pg.MOUSEBUTTONDOWN:
-                    mopos = pg.mouse.get_pos()
-
-                    if  mopos[0] >= DISPLAY_WIDTH * 0.6 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
-                        mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
-                        mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
-                        #done = not done
-                        #print("There ate not empty: ", input_boxes[0].text, input_boxes[1].text)
-                        table_10, pos = register(None, input_boxes[0].text, input_boxes[1].text)
-                        #print(table_10, "\n", pos[0])
-                        if table_10 == None and pos == None: 
-                            wrong_inp = True
-                        else:
-                            Next_stage = "SHOW_RESULT"
-                            done = not done 
-
-                for i in range(len(input_boxes)):
-                    frog = input_boxes[i].handle_event(event)
-                    if frog != None: 
-                        print(frog)
-
-            for box in input_boxes:
-                box.update()
-
-            screen.fill((30, 30, 30))
-            for box in input_boxes:
-                box.draw(screen)
-
-            Drawer2.drawText("Username: " , (0, 0, 0), (100, 110, 110), 
-                                DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.3, 20, screen = screen)
-            
-            Drawer2.drawText("Password: " , (0, 0, 0), (100, 110, 110), 
-                                DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.5, 20, screen = screen)
-
-
-            screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
-            Drawer2.drawText("Register" , (0, 0, 0), None, 
-                            DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
-
-            if wrong_inp: 
-                Drawer2.drawText("SAME NAME EXISTS" , (255, 0, 0), None, 
-                            DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.4, 20, screen = screen)
-
-
-
-            pg.display.flip()
-            #clock.tick(30)
-
-    if Next_stage == "SIGN_IN":
-        wrong_inp = False
-        Error_msg = ""
-        while not done:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    done = True
-
-                elif event.type == pg.MOUSEBUTTONDOWN:
-                    mopos = pg.mouse.get_pos()
-
-                    if  mopos[0] >= DISPLAY_WIDTH * 0.6 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
-                        mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
-                        mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
-                        #done = not done
-                        #print("There ate not empty: ", input_boxes[0].text, input_boxes[1].text)
-                        table_10, pos = sighin(None, input_boxes[0].text, input_boxes[1].text)
-                        #print(table_10, "\n", pos[0])
-                        match table_10: 
-                            case 1: 
-                                wrong_inp = True
-                                Error_msg = "You havn't registrated yet"
-                            case 2: 
-                                wrong_inp = True
-                                Error_msg = "You didn't input password"
-                            case 3: 
-                                wrong_inp = True
-                                Error_msg = "Wrong password"
-                            case 4: 
-                                wrong_inp = True
-                                Error_msg = "You didn't specify username"
-                            case _: 
-                                wrong_inp = False
-                                Error_msg = ""
-                                Next_stage = "SHOW_RESULT"
+                            if  mopos[0] >= DISPLAY_WIDTH * 0.1 and mopos[1] >= DISPLAY_HEIGHT * 0.1 and\
+                                mopos[0] <= DISPLAY_WIDTH * 0.1 + button_1.get_width() and\
+                                mopos[1] <= DISPLAY_HEIGHT * 0.1 + button_1.get_height():
+                                Next_stage = "REGISTRATION"
                                 done = not done
+                                break
+
+                            elif mopos[0] >= DISPLAY_WIDTH * 0.6 and mopos[1] >= DISPLAY_HEIGHT * 0.1 and\
+                                mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
+                                mopos[1] <= DISPLAY_HEIGHT * 0.1 + button_1.get_height():
+                                Next_stage = "SIGN_IN"
+                                done = not done
+                                break
+
+                    
+                screen.fill((30, 30, 30))
+                screen.blit(button_1, (DISPLAY_WIDTH*0.1, 0.1 * DISPLAY_HEIGHT))
+                Drawer2.drawText("Registration" , (0, 0, 0), None, 
+                                    DISPLAY_WIDTH*0.25, 0.16 * DISPLAY_HEIGHT, 20, screen = screen)
+                screen.blit(button_1, (DISPLAY_WIDTH*0.6, 0.1 * DISPLAY_HEIGHT))
+                Drawer2.drawText("Sign in" , (0, 0, 0), None, 
+                                    DISPLAY_WIDTH*0.75, 0.16 * DISPLAY_HEIGHT, 20, screen = screen)
+
+                pg.display.flip()
 
 
-                for i in range(len(input_boxes)):
-                    frog = input_boxes[i].handle_event(event)
-                    if frog != None: 
-                        print(frog)
+        if Next_stage == "REGISTRATION":
+            done = not done
+            wrong_inp = False
+            while not done:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        done = True
+                        exit_module = True
 
-            for box in input_boxes:
-                box.update()
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        mopos = pg.mouse.get_pos()
 
-            screen.fill((30, 30, 30))
-            for box in input_boxes:
-                box.draw(screen)
-
-            Drawer2.drawText("Username: " , (0, 0, 0), (100, 110, 110), 
-                                DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.3, 20, screen = screen)
-            
-            Drawer2.drawText("Password: " , (0, 0, 0), (100, 110, 110), 
-                                DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.5, 20, screen = screen)
-
-
-            screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
-            Drawer2.drawText("Sign in" , (0, 0, 0), None, 
-                            DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
-
-            if wrong_inp: 
-                Drawer2.drawText(Error_msg , (255, 0, 0), None, 
-                            DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.4, 20, screen = screen)
+                        if  mopos[0] >= DISPLAY_WIDTH * 0.6 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
+                            mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
+                            mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
+                            #done = not done
+                            #print("There ate not empty: ", input_boxes[0].text, input_boxes[1].text)
+                            table_10, pos = register(None, input_boxes[0].text, input_boxes[1].text)
+                            #print(table_10, "\n", pos[0])
+                            
 
 
+                            match table_10: 
+                                case 1: 
+                                    wrong_inp = True
+                                    Error_msg = "Username is empty"
+                                case 2: 
+                                    wrong_inp = True
+                                    Error_msg = "Password is empty"
+                                case 3: 
+                                    wrong_inp = True
+                                    Error_msg = "User with same also exists..."
+                                case _: 
+                                    wrong_inp = False
+                                    Error_msg = ""
+                                    Next_stage = "SHOW_RESULT"
+                                    done = not done
 
-            pg.display.flip()
-            #clock.tick(30)
+                        elif mopos[0] >= DISPLAY_WIDTH * 0.2 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
+                            mopos[0] <= DISPLAY_WIDTH * 0.2 + button_1.get_width() and\
+                            mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
+                            done = not done 
+                            Next_stage = "REG_SIGN"
 
+                    for i in range(len(input_boxes)):
+                        frog = input_boxes[i].handle_event(event)
+                        if frog != None: 
+                            print(frog)
 
-    done = not done        
-    if Next_stage == "SHOW_RESULT":
-        while not done:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    done = True
+                for box in input_boxes:
+                    box.update()
 
-            screen.fill((30, 30, 30))
-            #table_10 = eval(table_10)
-            
-            list_to_print = [("Top 10 players: ")] + table_10 + [("")] + [("Your place: ")] + [(pos[0][2])]
-            enter = 0 
-            for i in list_to_print: 
+                screen.fill((30, 30, 30))
+                for box in input_boxes:
+                    box.draw(screen)
+
+                Drawer2.drawText("Username: " , (0, 0, 0), (100, 110, 110), 
+                                    DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.3, 20, screen = screen)
                 
+                Drawer2.drawText("Password: " , (0, 0, 0), (100, 110, 110), 
+                                    DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.5, 20, screen = screen)
 
-                Drawer2.drawText(str(i)  , (50, 100, 11), None, 
-                                DISPLAY_WIDTH//2, DISPLAY_HEIGHT//5 + enter, 20, screen = screen)
-                enter += 25
+
+                screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
+                Drawer2.drawText("Register" , (0, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
+
+                screen.blit(button_1, (DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.8))
+                Drawer2.drawText("BACK" , (0, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
+
+                if wrong_inp: 
+                    Drawer2.drawText(Error_msg , (255, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.4, 20, screen = screen)
+
+
+
+                pg.display.flip()
+                #clock.tick(30)
+
+        if Next_stage == "SIGN_IN":
+            done = not done
+            wrong_inp = False
+            Error_msg = ""
+            while not done:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        done = True
+                        exit_module = True
+
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        mopos = pg.mouse.get_pos()
+
+                        if  mopos[0] >= DISPLAY_WIDTH * 0.6 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
+                            mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
+                            mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
+                            #done = not done
+                            #print("There ate not empty: ", input_boxes[0].text, input_boxes[1].text)
+                            table_10, pos = sighin(None, input_boxes[0].text, input_boxes[1].text)
+                            #print(table_10, "\n", pos[0])
+                            match table_10: 
+                                case 1: 
+                                    wrong_inp = True
+                                    Error_msg = "You are not registrated yet"
+                                case 2: 
+                                    wrong_inp = True
+                                    Error_msg = "You didn't input password"
+                                case 3: 
+                                    wrong_inp = True
+                                    Error_msg = "Wrong password"
+                                case 4: 
+                                    wrong_inp = True
+                                    Error_msg = "You didn't specify username"
+                                case _: 
+                                    wrong_inp = False
+                                    Error_msg = ""
+                                    Next_stage = "SHOW_RESULT"
+                                    done = not done
+
+                        elif mopos[0] >= DISPLAY_WIDTH * 0.2 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
+                            mopos[0] <= DISPLAY_WIDTH * 0.2 + button_1.get_width() and\
+                            mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
+                            done = not done 
+                            Next_stage = "REG_SIGN"
+
+
+                    for i in range(len(input_boxes)):
+                        frog = input_boxes[i].handle_event(event)
+                        if frog != None: 
+                            print(frog)
+
+                for box in input_boxes:
+                    box.update()
+
+                screen.fill((30, 30, 30))
+                for box in input_boxes:
+                    box.draw(screen)
+
+                Drawer2.drawText("Username: " , (0, 0, 0), (100, 110, 110), 
+                                    DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.3, 20, screen = screen)
+                
+                Drawer2.drawText("Password: " , (0, 0, 0), (100, 110, 110), 
+                                    DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.5, 20, screen = screen)
+
+
+                screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
+                Drawer2.drawText("Sign in" , (0, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
+
+                screen.blit(button_1, (DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.8))
+                Drawer2.drawText("BACK" , (0, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
+
+                if wrong_inp: 
+                    Drawer2.drawText(Error_msg , (255, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.4, 20, screen = screen)
+
+
+
+                pg.display.flip()
+                #clock.tick(30)
+
+
             
+        if Next_stage == "SHOW_RESULT":
+            done = not done 
+            while not done:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        done = True
+                        exit_module = True
+                    
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        mopos = pg.mouse.get_pos()
+
+                        if  mopos[0] >= DISPLAY_WIDTH * 0.6 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
+                            mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
+                            mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
+                            done = not done 
+                            Next_stage = "REG_SIGN"
+
+                screen.fill((30, 30, 30))
+                #table_10 = eval(table_10)
+                
+                list_to_print = [("Top 10 players: ")] + table_10 + [("")] + [("Your place: ")] + [(pos[0][2])]
+                enter = 0 
+                for i in list_to_print: 
+                    Drawer2.drawText(str(i)  , (50, 100, 11), None, 
+                                    DISPLAY_WIDTH//2, DISPLAY_HEIGHT//5 + enter, 20, screen = screen)
+                    enter += 25
+
+
+                screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
+                Drawer2.drawText("DONE" , (0, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
+                
+                
+                pg.display.flip()
+                #clock.tick(30)
+
             
-
-            pg.display.flip()
-            #clock.tick(30)
-
-        
 
     
 

@@ -11,6 +11,7 @@ import json
 import urllib
 from urllib.request import urlopen
 import ssl
+import random
 
 
 
@@ -55,7 +56,6 @@ def get_data():
 def handle_files(message):
   document_id = message.document.file_id
   file_info = bot.get_file(document_id)
-  print(document_id) # Выводим file_id
   print(f'http://api.telegram.org/file/bot{token_crypto}/{file_info.file_path}') 
   bot.send_message(message.chat.id, document_id) 
 
@@ -122,7 +122,7 @@ def save_data(messg):
 
     sql = "SELECT * FROM login_id "
     cursor.execute(sql)
-    data = cursor.fetchall()  # or use fetchone()
+    data = cursor.fetchall() 
     try:
         # Переводим словарь в строку
         str_data=json.dumps(data)
@@ -152,20 +152,20 @@ def register(messg, username_in = None, password_in = None):
 
     # регистрация
     print("Регистрация: ")
-    if username_in == None:
-        username_in = str(input("username: "))
+    if username_in == None or username_in == "":
+        return 1, None
 
     # includes case when registration initiated with telegram app
     try:
         user_id = [messg.chat.id]
     except:
-        user_id = [0]
+        user_id = [random.randint(0, 999999999)]
 
     cursor.execute(f"SELECT username FROM login_id WHERE username = ?", (username_in,))
     name_out = cursor.fetchone()
     if name_out is None: 
-        if password_in == None: 
-            password_in = str(input("password: "))
+        if password_in == None or password_in == "": 
+            return 2, None
         cursor.execute("INSERT INTO login_id (id, username, password) VALUES (?, ?, ?);", (user_id[0], username_in, password_in))
         connect.commit() 
         print("Done")
@@ -182,8 +182,8 @@ def register(messg, username_in = None, password_in = None):
         #cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
         return results_10, user_place
     else: 
-        print("Same user also exists...")
-        return None, None
+        print("User with same also exists...")
+        return 3, None
 
     
 
@@ -222,8 +222,7 @@ def sighin(messg, username_in = None, password_in = None):
             #password_in = str(input("password: "))
 
         if name_out[1] == password_in:
-            #"Вы успешно вошли")
-            #...
+            # Вы успешно вошли
             cursor.execute("SELECT id, username FROM login_id ORDER BY id DESC LIMIT 10;") 
             results_10 = cursor.fetchall()
             #cursor.execute(f"SELECT ROW_NUMBER() over(ORDER BY id DESC) num, id, username FROM login_id  WHERE username = (?) ORDER BY username;", (username_in,))
@@ -239,19 +238,11 @@ def sighin(messg, username_in = None, password_in = None):
             #Wrong password
             return 3, None
 
-    #
 
-    # if people_id_data is None: 
-    #     user_id = [messg.chat.id]
-    #     cursor.execute("INSERT INTO login_id VALUES(?);", user_id)
-    #     connect.commit() 
-    # else: 
-    #     bot.send_message(messg.chat.id, "Уже есть такой")
-
-# @bot.message_handler(commands = ["find"])
-# def start(messg): 
-#     connect = sqlite3.connect('./DB/test.db')
-#     cursor = connect.cursor()
+@bot.message_handler(commands = ["find"])
+def start(messg): 
+    connect = sqlite3.connect('./DB/test.db')
+    cursor = connect.cursor()
 
 
 
@@ -287,5 +278,5 @@ def delete(messg):
 
 
 
-bot.set_update_listener(listener)
-bot.polling()
+# bot.set_update_listener(listener)
+# bot.polling()
