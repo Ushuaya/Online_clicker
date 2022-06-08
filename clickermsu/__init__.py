@@ -181,6 +181,8 @@ class Game():
 
     def play(self) -> None:
         """Play loop of the game."""
+        pg.display.set_caption("Play")
+
         # Images
         imageSaver = ImageUploader('images')
         vmkLogo = imageSaver.uploadImage('click_logo.png', (0.125 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
@@ -269,11 +271,39 @@ class Game():
         return
     
     def options(self) -> None:
-        print("In options")
+        """Options menu."""
+        pg.display.set_caption("Options menu")
+
+        imageSaver = ImageUploader('images')
+        bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
+        font_name = "freesansbold.ttf" 
+        font_size = 120
+        OPT_TEXT = pg.font.Font(font_name, font_size).render("OPTIONS MENU", True, BLACK)
+        OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
+
+        clock = pg.time.Clock()
+        while self.running:
+            clock.tick(FPS)
+            self.gameDisplay.blit(bckgrnd_im, (0, 0))
+
+            self.gameDisplay.blit(OPT_TEXT, OPT_RECT)
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.running = False
+                    continue
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        self.main_menu()
+            
+            pg.display.flip()
+        return
+
 
     def main_menu(self) -> None:
         """Main menu screen."""
-        pg.display.set_caption("Menu")
+        pg.display.set_caption("Main menu")
 
         imageSaver = ImageUploader('images')
         button_dark_blue = imageSaver.uploadImage('button_dark_blue.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
