@@ -46,7 +46,7 @@ class InputBox:
                 if event.key == pg.K_RETURN:
                     self.print = self.text
                     self.text = ''
-                    self.txt_surface = FONT.render(self.text, True, self.color)
+                    #self.txt_surface = FONT.render(self.text, True, self.color)
                     return self.print
                 elif event.key == pg.K_BACKSPACE:
                     self.text = self.text[:-1]
