@@ -5,9 +5,14 @@ import pygame as pg
 import random
 import time
 from .Button import Button
+from . import input
+from . import insertion_deleting_sqlite
 from .Option import Option_switchable, Option_slider
 from os import path, listdir
 from typing import Any
+import threading
+import asyncio
+
 
 """ Play screen:
                         DISPLAY WIDTH
@@ -37,6 +42,7 @@ WHITE = (255,255,255)
 RED = (255,0,0)
 DARK_YELLOW = (150, 150, 30)
 GOLD = (230, 190, 85)
+f_stop = None
 
 LANGUAGES = ["Default", "English", "Russian", ]
 RESOLUTIONS = ["1024x768", "640x480", "1280x720", "1920x1080", ]
@@ -97,7 +103,7 @@ class MusicUploader():
         pg.mixer.music.play(fade_ms=5000)
         pg.mixer.music.set_endevent(self.SONG_END)
 
-    def setVolume(self, v: int) -> None:
+    def setVolume(self, v: float) -> None:
         """Set music volume to v."""
         if 0 < v <= 1:
             pg.mixer.music.set_volume(v)
@@ -179,6 +185,7 @@ class Game():
     costUpgrade = 50
     costAutominer = 50
     ver = "0.1"
+    User = None
 
     def autominer(self):
         """Auto adding coins if corresponding upgrade has been bought."""
@@ -259,7 +266,6 @@ class Game():
                     # if click for home
                     elif HOME_BUTTON.checkForInput(MOUSE_POS):
                         return
-
 
             # Func to create dynamic background
             shiftBackgoungnd.shift(self.gameDisplay, bckgrnd_im, DISPLAY_WIDTH)
@@ -406,28 +412,22 @@ class Game():
                         return
                     if APPLY_BUTTON.checkForInput(MOUSE_POS):
                         changes["new_volume"] = VOLUME_OPTION.get_value()
+                        # Bug in pygame-widgets: old Sliders and TextBoxes are not removed from screen
                         VOLUME_OPTION.slider.hide()
                         VOLUME_OPTION.output.hide()
                         self._changes_applied = self.apply_changes(**changes)
-                        # Bug in pygame-widgets: old Sliders and TextBoxes are not removed from screen
-                        
-
                 # If current music ends
                 elif event.type == self.musicPlayer.SONG_END:
                     self.musicPlayer.playRandomMusic()
             
-            pg.display.flip()
-
-        #if self._changes_applied:
-        #    self._changes_applied = False
-        #    self.options()
-        
+            pg.display.flip()        
         return
 
 
     def main_menu(self) -> None:
         """Main menu screen."""
         pg.display.set_caption("Main menu")
+        global f_stop
 
         imageSaver = ImageUploader('images')
         button_dark_blue = imageSaver.uploadImage('button_dark_blue.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
@@ -441,9 +441,11 @@ class Game():
         
         PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT), 
                              text_input="PLAY", font_size=48)
-        OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.55 * DISPLAY_HEIGHT), 
+        OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.48 * DISPLAY_HEIGHT), 
                                 text_input="OPTIONS", font_size=48)
-        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.77 * DISPLAY_HEIGHT), 
+        RATING_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.63 * DISPLAY_HEIGHT), 
+                             text_input="SAVE & RATING", font_size=36)
+        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
                              text_input="QUIT", font_size=48, hovering_color=BLACK)
         
         clock = pg.time.Clock()
@@ -453,9 +455,17 @@ class Game():
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
+            
+            if self.User != None: 
+                USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
+                USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
+                self.gameDisplay.blit(USER_TEXT, USER_RECT)
+                if f_stop == None:
+                    f_stop = threading.Event()
+                    self.updation_of_cur_user_data(f_stop, self.User, self.coins)
 
-            for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
-                button.changeColor(MENU_MOUSE_POS)
+            for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON, RATING_BUTTON]:
+                button.changeColor(MENU_MOUSE_POS, self.gameDisplay)
                 button.update(self.gameDisplay)
             
             for event in pg.event.get():
@@ -470,6 +480,13 @@ class Game():
                         if self._changes_applied:
                             self._changes_applied = False
                             self._reset_screen = True
+                    if RATING_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        self.coins, self.User = input.main_c(self.coins)
+                        #stopping previous thread
+                        if self.User != None: 
+                            if f_stop != None:
+                                f_stop.set()
+                                f_stop = None
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         continue
@@ -480,11 +497,19 @@ class Game():
             pg.display.flip()
         return
 
+    def updation_of_cur_user_data(self, f_stop, username_, coins):
+        print("Updation")
+        insertion_deleting_sqlite.update_signed(None, username_, self.coins) 
+        if not f_stop.is_set():
+            # call f() again in 10 seconds
+            threading.Timer(10, self.updation_of_cur_user_data, [f_stop , username_, self.coins]).start()
+
     def __init__(self) -> None:
         """Start the game."""
         # Setting display
         self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-
+        FONT = pg.font.Font(None, 32)
+        
         # Music
         self.musicPlayer = MusicUploader('music')
         self.musicPlayer.playRandomMusic()
@@ -501,4 +526,10 @@ class Game():
         while self._reset_screen:
             self._reset_screen = False
             self.main_menu()
+        
+        global f_stop
+        if f_stop != None:
+            f_stop.set()
+            f_stop = None
+            
         return
