@@ -1,8 +1,11 @@
+"""Main module."""
+
 from typing import Any
 import pygame as pg
 import time
 import random
 from .Button import Button
+from .Option import Option_switchable
 from os import path, listdir
 
 
@@ -272,30 +275,57 @@ class Game():
     
     def options(self) -> None:
         """Options menu."""
-        pg.display.set_caption("Options menu")
+        pg.display.set_caption("Options")
 
         imageSaver = ImageUploader('images')
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        panel_green = imageSaver.uploadImage('button_green.png', 
+                                              (0.30 * DISPLAY_WIDTH, 0.15 * DISPLAY_HEIGHT))
+        panel_yellow = imageSaver.uploadImage('button_yellow.png',
+                                               (0.30 * DISPLAY_WIDTH, 0.15 * DISPLAY_HEIGHT))
+        button_prev = imageSaver.uploadImage('arrow-left.png', 
+                                             (0.10 * DISPLAY_WIDTH, 0.15 * DISPLAY_HEIGHT))
+        button_next = imageSaver.uploadImage('arrow-right.png', 
+                                             (0.10 * DISPLAY_WIDTH, 0.15 * DISPLAY_HEIGHT))
 
-        font_name = "freesansbold.ttf" 
-        font_size = 120
-        OPT_TEXT = pg.font.Font(font_name, font_size).render("OPTIONS MENU", True, BLACK)
-        OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
+        #font_name = "freesansbold.ttf" 
+        #font_size = 120
+        #OPT_TEXT = pg.font.Font(font_name, font_size).render("OPTIONS MENU", True, BLACK)
+        #OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
+
+        LANGUAGES = ["English", "Russian", ]
+        RESOLUTIONS = ["1024x768", "640x480", "1280x720", "1920x1080", ]
+        LANGUAGE_OPTION = Option_switchable("Language", (0.05 * DISPLAY_WIDTH, 0.20 * DISPLAY_HEIGHT), 
+                                            panel_green, panel_yellow, button_prev, button_next, 
+                                 variants=LANGUAGES)
+        RESOLUTION_OPTION = Option_switchable("Resolution", (0.05 * DISPLAY_WIDTH, 0.40 * DISPLAY_HEIGHT), 
+                                              panel_green, panel_yellow, button_prev, button_next, 
+                                              variants=RESOLUTIONS)
+
 
         clock = pg.time.Clock()
         while self.running:
             clock.tick(FPS)
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
 
-            self.gameDisplay.blit(OPT_TEXT, OPT_RECT)
+            #self.gameDisplay.blit(OPT_TEXT, OPT_RECT)
+            for option in [LANGUAGE_OPTION, RESOLUTION_OPTION, ]:
+                option.update(self.gameDisplay)
 
             for event in pg.event.get():
+                MOUSE_POS = pg.mouse.get_pos()
                 if event.type == pg.QUIT:
                     self.running = False
                     continue
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
                         self.main_menu()
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    LANGUAGE_OPTION.switch_mb(MOUSE_POS)
+                    RESOLUTION_OPTION.switch_mb(MOUSE_POS)
+                # If current music ends
+                elif event.type == self.musicPlayer.SONG_END:
+                    self.musicPlayer.playRandomMusic()
             
             pg.display.flip()
         return
@@ -338,7 +368,7 @@ class Game():
                 if event.type == pg.QUIT:
                     self.running = False
                     continue
-                if event.type == pg.MOUSEBUTTONDOWN:
+                elif event.type == pg.MOUSEBUTTONDOWN:
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.play()
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
@@ -346,6 +376,9 @@ class Game():
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         continue
+                # If current music ends
+                elif event.type == self.musicPlayer.SONG_END:
+                    self.musicPlayer.playRandomMusic()
 
             pg.display.flip()
         return
