@@ -14,15 +14,6 @@ import ssl
 import random
 
 
-
-# engine = create_engine('sqlite://', echo=False)
-
-# df = pandas.read_csv(csvfile)
-# df.to_sql("MSK_test", con=engine, if_exists='append', index=False)
-
-
-
-
 API_TOKEN = token_crypto
 
 bot = telebot.TeleBot(API_TOKEN)
@@ -32,12 +23,16 @@ global_data_message = 430
 global_file_id = "BQACAgIAAxkDAAIBrmKbrXkKo_0d3Nbo-Cmr1Zpy0_fWAALzGwACYDDgSFN_tbcimLj3JAQ"
 
 def get_data():
-    # Very strange procedure, but it is necessary, in order to get new file id from message (API doesn't support message return by its id withount such manipulations)
+    """Function to get users' data from server."""
+    # Very strange procedure, but it is necessary, in order to get new 
+    # file id from message (API doesn't support message return by its 
+    # id withount such manipulations)
     try: 
-        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current database"))).document.file_id
+        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, 
+                        message_id = global_data_message, caption = str("Current database"))).document.file_id
     except: 
-        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, message_id = global_data_message, caption = str("Current Database"))).document.file_id
-    print(global_file_id)
+        global_file_id = (bot.edit_message_caption(chat_id  = global_data_chat, 
+                        message_id = global_data_message, caption = str("Current Database"))).document.file_id
 
     file_data = bot.get_file(global_file_id)
     print("ok")
@@ -60,13 +55,15 @@ def get_data():
 
 @bot.message_handler(content_types=["document", "video", "audio"])
 def handle_files(message):
-  document_id = message.document.file_id
-  file_info = bot.get_file(document_id)
-  print(f'http://api.telegram.org/file/bot{token_crypto}/{file_info.file_path}') 
-  bot.send_message(message.chat.id, document_id) 
+    """Debugging function."""
+    document_id = message.document.file_id
+    file_info = bot.get_file(document_id)
+    print(f'http://api.telegram.org/file/bot{token_crypto}/{file_info.file_path}') 
+    bot.send_message(message.chat.id, document_id) 
 
 @bot.message_handler(commands = ["update"])
 def update_data(messg):
+    """Function to updtae users' data on server."""
     # server case
     # connect = sqlite3.connect('users.db')
     # cursor = connect.cursor()
@@ -83,7 +80,6 @@ def update_data(messg):
     cursor.execute(sql)
     data = cursor.fetchall()
     str_data = json.dumps(data)
-    #print("data to send:\n", str_data)
     admin_id = global_data_chat
     config_id = global_data_message
     try:
@@ -95,11 +91,10 @@ def update_data(messg):
     except Exception as ex:
         print(ex)
 
-    #print(get_data())
 
-"""Use this for initial message for bot-server"""
 @bot.message_handler(commands = ["save"])
 def save_data(messg):
+    """Use this function for initial message for bot-server."""
     # server case
     # connect = sqlite3.connect('users.db')
     # cursor = connect.cursor()
@@ -141,6 +136,7 @@ def save_data(messg):
 
 @bot.message_handler(commands = ["register"])
 def register(messg, username_in = None, password_in = None, coins = None): 
+    """Function to registrate new user in database."""
     # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
@@ -183,14 +179,14 @@ def register(messg, username_in = None, password_in = None, coins = None):
         update_data(None)
         cursor.execute("SELECT id, username FROM login_id ORDER BY id DESC LIMIT 10;") 
         results_10 = cursor.fetchall()
-        #cursor.execute(f"SELECT ROW_NUMBER() over(ORDER BY id DESC) num, id, username FROM login_id  WHERE username = (?) ORDER BY username;", (username_in,))
+        # cursor.execute(f"SELECT ROW_NUMBER() over(ORDER BY id DESC) num, id, username FROM login_id  WHERE username = (?) ORDER BY username;", (username_in,))
         cursor.execute("SELECT id, username, ROW_NUMBER() over(ORDER BY id DESC) AS Row FROM login_id;")
-        #cursor.executemany("SELECT id, username, Row FROM login_id WHERE username = (?);", (username_in,))
+        # cursor.executemany("SELECT id, username, Row FROM login_id WHERE username = (?);", (username_in,))
 
         user_place = cursor.fetchall()
         user_place = [i for i in user_place if i[1] == username_in]
-        #connect.commit() 
-        #cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
+        # connect.commit() 
+        # cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
         return results_10, user_place
     else: 
         print("User with same also exists...")
@@ -224,17 +220,17 @@ def sighin(messg, username_in = None, password_in = None, coins = None):
     #вход с логином и паролем
     if username_in == None or username_in == "":
         #User didn't specify username
-        return 4, None
+        return 4, None, coins
         username_in = str(input("username: "))
     cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
     name_out = cursor.fetchone()
     if name_out is None: 
         #bot.send_message(messg.chat.id, "Вы ещё не регестрировались.")
-        return 1, None
+        return 1, None, coins
     else: 
         if password_in == None or password_in == "":
             #Пароль не введён
-            return 2, None
+            return 2, None, coins
             #password_in = str(input("password: "))
 
         if name_out[1] == password_in:
@@ -247,6 +243,7 @@ def sighin(messg, username_in = None, password_in = None, coins = None):
             #updating
             cursor.execute(f"DELETE FROM login_id WHERE username = (?)", (username_in,))
             cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", [[int(score_out), str(username_in), str(password_in)]])
+            connect.commit() 
             update_data(None)
             #table forming
             cursor.execute("SELECT id, username FROM login_id ORDER BY id DESC LIMIT 10;") 
@@ -262,7 +259,7 @@ def sighin(messg, username_in = None, password_in = None, coins = None):
             return results_10, user_place, score_out
         else: 
             #Wrong password
-            return 3, None
+            return 3, None, coins
 
 
 @bot.message_handler(commands = ["find"])

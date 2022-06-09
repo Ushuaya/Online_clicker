@@ -3,12 +3,14 @@ import pygame as pg
 import time
 import random
 from . import input
-print("this: ", dir(input))
+from . import insertion_deleting_sqlite
 try:
     from .Button import Button
 except:
     from Button import Button
 from os import path, listdir
+import threading
+import asyncio
 
 
 """ Play screen:
@@ -36,6 +38,13 @@ LIGHT_BLUE = (173, 216, 230)
 GREEN = (0, 255, 0)
 WHITE = (255,255,255)
 RED = (255,0,0)
+
+def timer_start():
+    threading.Timer(30.0, timer_start).start()
+    try:
+        asyncio.run_coroutine_threadsafe(insertion_deleting_sqlite.update_data, bot.loop)
+    except Exception as exc:
+        pass
 
 
 class ImageUploader():
@@ -178,6 +187,7 @@ class Game():
     costUpgrade = 50
     costAutominer = 50
     ver = "0.1"
+    User = None
 
     def autominer(self):
         """Auto adding coins if corresponding upgrade has been bought."""
@@ -268,7 +278,7 @@ class Game():
             shiftBackgoungnd.shift(self.gameDisplay, bckgrnd_im, DISPLAY_WIDTH)
 
             for button in [UPGRADE_BUTTON, AUTOMINER_BUTTON, MENU_BUTTON]:
-                button.changeColor(MOUSE_POS)
+                button.changeColor(MOUSE_POS, self.gameDisplay)
                 button.update(self.gameDisplay)
 
             Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, button_1, butn_bckrnd)
@@ -346,9 +356,13 @@ class Game():
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
+            if self.User != None: 
+                USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
+                USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
+                self.gameDisplay.blit(USER_TEXT, USER_RECT)
 
             for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON, RATING_BUTTON]:
-                button.changeColor(MENU_MOUSE_POS)
+                button.changeColor(MENU_MOUSE_POS, self.gameDisplay)
                 button.update(self.gameDisplay)
             
             for event in pg.event.get():
@@ -361,7 +375,7 @@ class Game():
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
                     if RATING_BUTTON.checkForInput(MENU_MOUSE_POS):
-                        self.coins = input.main_c(self.coins)
+                        self.coins, self.User = input.main_c(self.coins)
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         continue
