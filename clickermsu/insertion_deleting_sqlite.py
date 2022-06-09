@@ -192,7 +192,42 @@ def register(messg, username_in = None, password_in = None, coins = None):
         print("User with same also exists...")
         return 3, None
 
-    
+
+@bot.message_handler(commands = ["update_signed"])
+def update_signed(messg, username_in = None, coins = None): 
+
+    # server case
+    connect = sqlite3.connect('users.db')
+    cursor = connect.cursor()
+    try:
+        cursor.execute("DROP TABLE login_id;")
+    except:
+        pass
+    cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    data = get_data()
+    #print(data)
+    cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
+    connect.commit() 
+
+    # local case
+    # connect = sqlite3.connect('users.db')
+    # cursor = connect.cursor()
+    # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
+    # connect.commit() 
+
+    cursor.execute(f"SELECT id, username, password FROM login_id WHERE username = (?)", (username_in,))
+    score = cursor.fetchone()
+    score_out = max(score[0], coins)
+    print(score_out)
+
+    #updating
+    cursor.execute(f"DELETE FROM login_id WHERE username = (?)", (username_in,))
+    cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", [[int(score_out), str(score[1]), str(score[2])]])
+    connect.commit() 
+    update_data(None)
+    return 
+
+
 
 
 @bot.message_handler(commands = ["sighin"])
@@ -217,7 +252,7 @@ def sighin(messg, username_in = None, password_in = None, coins = None):
     # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
     # connect.commit() 
 
-    #вход с логином и паролем
+    # вход с логином и паролем
     if username_in == None or username_in == "":
         #User didn't specify username
         return 4, None, coins
