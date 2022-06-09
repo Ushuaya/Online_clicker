@@ -7,12 +7,15 @@ import random
 from .Button import Button
 from .Option import Option_switchable
 from . import input
+from . import insertion_deleting_sqlite
 #print("this: ", dir(input))
 #try:
 #    from .Button import Button
 #except:
 #    from Button import Button
 from os import path, listdir
+import threading
+import asyncio
 
 
 """ Play screen:
@@ -40,6 +43,15 @@ LIGHT_BLUE = (173, 216, 230)
 GREEN = (0, 255, 0)
 WHITE = (255,255,255)
 RED = (255,0,0)
+f_stop = None
+
+# def timer_start():
+#     threading.Timer(30.0, timer_start).start()
+#     try:
+#         asyncio.run_coroutine_threadsafe(insertion_deleting_sqlite.update_signed, bot.loop)
+#     except Exception as exc:
+#         pass
+
 
 
 class ImageUploader():
@@ -182,6 +194,7 @@ class Game():
     costUpgrade = 50
     costAutominer = 50
     ver = "0.1"
+    User = None
 
     def autominer(self):
         """Auto adding coins if corresponding upgrade has been bought."""
@@ -272,7 +285,7 @@ class Game():
             shiftBackgoungnd.shift(self.gameDisplay, bckgrnd_im, DISPLAY_WIDTH)
 
             for button in [UPGRADE_BUTTON, AUTOMINER_BUTTON, MENU_BUTTON]:
-                button.changeColor(MOUSE_POS)
+                button.changeColor(MOUSE_POS, self.gameDisplay)
                 button.update(self.gameDisplay)
 
             Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, button_1, butn_bckrnd)
@@ -347,6 +360,7 @@ class Game():
     def main_menu(self) -> None:
         """Main menu screen."""
         pg.display.set_caption("Main menu")
+        global f_stop
 
         imageSaver = ImageUploader('images')
         button_dark_blue = imageSaver.uploadImage('button_dark_blue.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
@@ -374,9 +388,16 @@ class Game():
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
+            if self.User != None: 
+                USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
+                USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
+                self.gameDisplay.blit(USER_TEXT, USER_RECT)
+                if f_stop == None:
+                    f_stop = threading.Event()
+                    self.updation_of_cur_user_data(f_stop, self.User, self.coins)
 
             for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON, RATING_BUTTON]:
-                button.changeColor(MENU_MOUSE_POS)
+                button.changeColor(MENU_MOUSE_POS, self.gameDisplay)
                 button.update(self.gameDisplay)
             
             for event in pg.event.get():
@@ -389,13 +410,25 @@ class Game():
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
                     if RATING_BUTTON.checkForInput(MENU_MOUSE_POS):
-                        self.coins = input.main_c(self.coins)
+                        self.coins, self.User = input.main_c(self.coins)
+                        #stopping previous thread
+                        if self.User != None: 
+                            if f_stop != None:
+                                f_stop.set()
+                                f_stop = None
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         continue
 
             pg.display.flip()
         return
+
+    def updation_of_cur_user_data(self, f_stop, username_, coins):
+        print("Updation")
+        insertion_deleting_sqlite.update_signed(None, username_, self.coins) 
+        if not f_stop.is_set():
+            # call f() again in 10 seconds
+            threading.Timer(10, self.updation_of_cur_user_data, [f_stop , username_, self.coins]).start()
 
     def __init__(self) -> None:
         """Start the game."""
@@ -411,4 +444,8 @@ class Game():
         self.running = True
 
         self.main_menu()
+        global f_stop
+        if f_stop != None:
+            f_stop.set()
+            f_stop = None
         return
