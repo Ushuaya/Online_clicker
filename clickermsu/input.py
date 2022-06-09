@@ -1,21 +1,21 @@
 import pygame as pg
-from insertion_deleting_sqlite import register, sighin
-from __init__ import Drawing, ImageUploader
-DISPLAY_WIDTH = 640
-DISPLAY_HEIGHT = 480
+from .insertion_deleting_sqlite import register, sighin
+from .__init__ import Drawing, ImageUploader
+DISPLAY_WIDTH = 1024
+DISPLAY_HEIGHT = 768
 
 
 
 
 pg.init()
-screen = pg.display.set_mode((640, 480))
+screen = pg.display.set_mode((1024, 768))
 pg.display.set_caption("Inputer")
 COLOR_INACTIVE = pg.Color('lightskyblue3')
 COLOR_ACTIVE = pg.Color('dodgerblue2')
 FONT = pg.font.Font(None, 32)
 
 imageSaver = ImageUploader('images')
-button_1 = imageSaver.uploadImage('button_1.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+button_1 = imageSaver.uploadImage('button_upgrade.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
 
 
 class InputBox:
@@ -69,7 +69,8 @@ class InputBox:
 
 
 
-def main():
+def main_c(coins = None):
+    FONT = pg.font.Font(None, 32)
     print("ok")
     clock = pg.time.Clock()
     input_box1 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.28, 140, 32)
@@ -86,6 +87,7 @@ def main():
     Next_stage = "REG_SIGN"
     done = False
     exit_module = False
+    coins_update = 0
 
     while not exit_module:
         if Next_stage == "REG_SIGN":
@@ -113,6 +115,14 @@ def main():
                                 done = not done
                                 break
 
+                            elif mopos[0] >= DISPLAY_WIDTH * 0.2 and mopos[1] >= DISPLAY_HEIGHT * 0.8 and\
+                                mopos[0] <= DISPLAY_WIDTH * 0.2 + button_1.get_width() and\
+                                mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
+                                Next_stage = ""
+                                done = not done
+                                exit_module = not exit_module
+                                return coins
+
                     
                 screen.fill((30, 30, 30))
                 screen.blit(button_1, (DISPLAY_WIDTH*0.1, 0.1 * DISPLAY_HEIGHT))
@@ -121,6 +131,10 @@ def main():
                 screen.blit(button_1, (DISPLAY_WIDTH*0.6, 0.1 * DISPLAY_HEIGHT))
                 Drawer2.drawText("Sign in" , (0, 0, 0), None, 
                                     DISPLAY_WIDTH*0.75, 0.16 * DISPLAY_HEIGHT, 20, screen = screen)
+
+                screen.blit(button_1, (DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.8))
+                Drawer2.drawText("BACK" , (0, 0, 0), None, 
+                                DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
 
                 pg.display.flip()
 
@@ -143,7 +157,8 @@ def main():
                             #done = not done
                             #print("There ate not empty: ", input_boxes[0].text, input_boxes[1].text)
                             if input_boxes_registration[1].text == input_boxes_registration[2].text:
-                                table_10, pos = register(None, input_boxes_registration[0].text, input_boxes_registration[1].text)
+                                table_10, pos = register(None, input_boxes_registration[0].text, input_boxes_registration[1].text, coins)
+                                coins_update = coins
                             else:
                                 table_10 = 4
                             #print(table_10, "\n", pos[0])
@@ -232,7 +247,7 @@ def main():
                             mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
                             #done = not done
                             #print("There ate not empty: ", input_boxes[0].text, input_boxes[1].text)
-                            table_10, pos = sighin(None, input_boxes[0].text, input_boxes[1].text)
+                            table_10, pos, coins_update = sighin(None, input_boxes[0].text, input_boxes[1].text, coins)
                             #print(table_10, "\n", pos[0])
                             match table_10: 
                                 case 1: 
@@ -313,7 +328,9 @@ def main():
                             mopos[0] <= DISPLAY_WIDTH * 0.6 + button_1.get_width() and\
                             mopos[1] <= DISPLAY_HEIGHT * 0.8 + button_1.get_height():
                             done = not done 
-                            Next_stage = "REG_SIGN"
+                            #Next_stage = "REG_SIGN"
+                            exit_module = not exit_module
+                            return coins_update
 
                 screen.fill((30, 30, 30))
                 #table_10 = eval(table_10)

@@ -5,7 +5,7 @@ import sqlite3
 #import pandas
 #from sqlalchemy import create_engine
 import telebot
-from restricted_area import token_crypto
+from .restricted_area import token_crypto
 import io
 import json
 import urllib
@@ -80,11 +80,10 @@ def update_data(messg):
     cursor = connect.cursor()
 
     sql = "SELECT * FROM login_id "
-    cursor.execute(f"DELETE FROM login_id WHERE id = 721641425")
     cursor.execute(sql)
     data = cursor.fetchall()
     str_data = json.dumps(data)
-    print("data to send:\n", str_data)
+    #print("data to send:\n", str_data)
     admin_id = global_data_chat
     config_id = global_data_message
     try:
@@ -141,14 +140,17 @@ def save_data(messg):
         print(ex)
 
 @bot.message_handler(commands = ["register"])
-def register(messg, username_in = None, password_in = None): 
+def register(messg, username_in = None, password_in = None, coins = None): 
     # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
-    cursor.execute("DROP TABLE login_id;")
+    try:
+        cursor.execute("DROP TABLE login_id;")
+    except:
+        pass
     cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
     data = get_data()
-    print(data)
+    #print(data)
     cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
     connect.commit() 
 
@@ -175,7 +177,7 @@ def register(messg, username_in = None, password_in = None):
     if name_out is None: 
         if password_in == None or password_in == "": 
             return 2, None
-        cursor.execute("INSERT INTO login_id (id, username, password) VALUES (?, ?, ?);", (user_id[0], username_in, password_in))
+        cursor.execute("INSERT INTO login_id (id, username, password) VALUES (?, ?, ?);", (coins, username_in, password_in))
         connect.commit() 
         print("Done")
         update_data(None)
@@ -198,15 +200,18 @@ def register(messg, username_in = None, password_in = None):
 
 
 @bot.message_handler(commands = ["sighin"])
-def sighin(messg, username_in = None, password_in = None): 
+def sighin(messg, username_in = None, password_in = None, coins = None): 
 
     # server case
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()
-    cursor.execute("DROP TABLE login_id;")
+    try:
+        cursor.execute("DROP TABLE login_id;")
+    except:
+        pass
     cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);") 
     data = get_data()
-    print(data)
+    #print(data)
     cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
     connect.commit() 
 
@@ -234,6 +239,16 @@ def sighin(messg, username_in = None, password_in = None):
 
         if name_out[1] == password_in:
             # Вы успешно вошли
+            cursor.execute(f"SELECT id FROM login_id WHERE username = (?)", (username_in,))
+            score = cursor.fetchone()
+            score_out = max(score[0], coins)
+            print(score_out)
+
+            #updating
+            cursor.execute(f"DELETE FROM login_id WHERE username = (?)", (username_in,))
+            cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", [[int(score_out), str(username_in), str(password_in)]])
+            update_data(None)
+            #table forming
             cursor.execute("SELECT id, username FROM login_id ORDER BY id DESC LIMIT 10;") 
             results_10 = cursor.fetchall()
             #cursor.execute(f"SELECT ROW_NUMBER() over(ORDER BY id DESC) num, id, username FROM login_id  WHERE username = (?) ORDER BY username;", (username_in,))
@@ -244,7 +259,7 @@ def sighin(messg, username_in = None, password_in = None):
             user_place = [i for i in user_place if i[1] == username_in]
             #connect.commit() 
             #cursor.execute(f"SELECT username, password FROM login_id WHERE username = ?", (username_in,))
-            return results_10, user_place
+            return results_10, user_place, score_out
         else: 
             #Wrong password
             return 3, None
