@@ -11,7 +11,8 @@ RED = (255,0,0)
 class Button:
     def __init__(self, image: Surface, pos: tuple[int], text_input: str, 
                  font_name: str = "freesansbold.ttf", font_size: int = 20,
-                 base_color: tuple[int] = WHITE, hovering_color: tuple[int] = RED):
+                 base_color: tuple[int] = WHITE, hovering_color: tuple[int] = RED, 
+                 tipper: list = None):
         """Create a button.
         
         params:
@@ -31,6 +32,7 @@ class Button:
             self.image = self.text
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
         self.text_rect = self.text.get_rect(center=self.rect.center)
+        self.tip = tipper
 
     def update(self, screen: Surface) -> None:
         """Update button image."""
@@ -47,10 +49,16 @@ class Button:
         self.text = self.font.render(self.text_input, True, self.base_color)
         self.text_rect = self.text.get_rect(center=self.rect.center)
 
-    def changeColor(self, position: tuple[int]) -> None:
+    def changeColor(self, position: tuple[int], screen: Surface = None) -> None:
         """Change button's text color if position in button's range."""
         if self.checkForInput(position):
             self.text = self.font.render(self.text_input, True, self.hovering_color)
+            if self.tip != None: 
+                step = 0
+                for i in self.tip:
+                    text = pygame.font.Font("freesansbold.ttf", 25).render(i, True, (0,0,0), None)
+                    screen.blit(text, self.text.get_rect(center=((self.rect.left + self.rect.right)/2, self.y_pos + 80 + step)))
+                    step += abs(self.text_rect.top - self.text_rect.bottom)
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
     
