@@ -31,6 +31,7 @@ DISPLAY_HEIGHT = 768
 FPS = 60
 BLACK = (0, 0, 0)
 LIGHT_BLUE = (173, 216, 230)
+BLUE_GRAY = (115, 147, 179)
 GREEN = (0, 255, 0)
 WHITE = (255,255,255)
 RED = (255,0,0)
@@ -275,6 +276,11 @@ class Game():
             pg.display.flip()
         return
     
+    def apply_changes(self) -> None:
+        """Apply changes in options."""
+        print("!!!TEST SUCCESS!!!")
+        return
+
     def options(self) -> None:
         """Options menu."""
         pg.display.set_caption("Options")
@@ -289,32 +295,45 @@ class Game():
                                              (0.10 * DISPLAY_WIDTH, 0.15 * DISPLAY_HEIGHT))
         button_next = imageSaver.uploadImage('arrow-right.png', 
                                              (0.10 * DISPLAY_WIDTH, 0.15 * DISPLAY_HEIGHT))
+        button_apply = imageSaver.uploadImage('button_light_green.png',
+                                              (0.35 * DISPLAY_WIDTH, 0.175 * DISPLAY_HEIGHT))
+        button_back = imageSaver.uploadImage('button_violet.png',
+                                              (0.35 * DISPLAY_WIDTH, 0.175 * DISPLAY_HEIGHT))
 
-        #font_name = "freesansbold.ttf" 
-        #font_size = 120
-        #OPT_TEXT = pg.font.Font(font_name, font_size).render("OPTIONS MENU", True, BLACK)
-        #OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
+        font_name = "freesansbold.ttf" 
+        font_size = 56
+        OPT_TEXT = pg.font.Font(font_name, font_size).render("Options", True, BLACK)
+        OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT * 0.08))
 
         LANGUAGES = ["English", "Russian", ]
         RESOLUTIONS = ["1024x768", "640x480", "1280x720", "1920x1080", ]
-        LANGUAGE_OPTION = Option_switchable("Language", (0.05 * DISPLAY_WIDTH, 0.20 * DISPLAY_HEIGHT), 
+        LANGUAGE_OPTION = Option_switchable("Language", (0.05 * DISPLAY_WIDTH, 0.30 * DISPLAY_HEIGHT), 
                                             panel_green, panel_yellow, button_prev, button_next, 
                                  variants=LANGUAGES)
-        RESOLUTION_OPTION = Option_switchable("Resolution", (0.05 * DISPLAY_WIDTH, 0.40 * DISPLAY_HEIGHT), 
+        RESOLUTION_OPTION = Option_switchable("Resolution", (0.05 * DISPLAY_WIDTH, 0.50 * DISPLAY_HEIGHT), 
                                               panel_green, panel_yellow, button_prev, button_next, 
                                               variants=RESOLUTIONS)
         VOLUME_OPTION = Option_slider(self.gameDisplay, "Volume", 
-                                      (0.05 * DISPLAY_WIDTH, 0.60 * DISPLAY_HEIGHT), panel_green,
+                                      (0.05 * DISPLAY_WIDTH, 0.70 * DISPLAY_HEIGHT), panel_green,
                                       0, 100, 1, slider_colour=DARK_YELLOW, handle_colour=GOLD)
+
+        APPLY_BUTTON = Button(button_apply, (0.30 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), "Apply",
+                              font_size=46, hovering_color=LIGHT_BLUE)
+        BACK_BUTTON = Button(button_back, (0.70 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), "Esc: back",
+                              font_size=46, hovering_color=BLUE_GRAY)        
 
         clock = pg.time.Clock()
         while self.running:
             clock.tick(FPS)
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
 
-            #self.gameDisplay.blit(OPT_TEXT, OPT_RECT)
-            for option in [LANGUAGE_OPTION, RESOLUTION_OPTION, VOLUME_OPTION]:
+            self.gameDisplay.blit(OPT_TEXT, OPT_RECT)
+            for option in [LANGUAGE_OPTION, RESOLUTION_OPTION, VOLUME_OPTION, ]:
                 option.update(self.gameDisplay)
+
+            for button in [APPLY_BUTTON, BACK_BUTTON]:
+                button.changeColor(pg.mouse.get_pos())
+                button.update(self.gameDisplay)
 
             events = pg.event.get()
             for event in events:
@@ -324,10 +343,15 @@ class Game():
                     continue
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
-                        self.main_menu()
+                        return
                 if event.type == pg.MOUSEBUTTONDOWN:
                     LANGUAGE_OPTION.switch_mb(MOUSE_POS)
                     RESOLUTION_OPTION.switch_mb(MOUSE_POS)
+                    if BACK_BUTTON.checkForInput(MOUSE_POS):
+                        return
+                    if APPLY_BUTTON.checkForInput(MOUSE_POS):
+                        self.apply_changes()
+
                 # If current music ends
                 elif event.type == self.musicPlayer.SONG_END:
                     self.musicPlayer.playRandomMusic()
@@ -347,9 +371,9 @@ class Game():
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
         font_name = "freesansbold.ttf" 
-        font_size = 120
-        MENU_TEXT = pg.font.Font(font_name, font_size).render("CLICKER HEHE", True, BLACK)
-        MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.13 * DISPLAY_HEIGHT))
+        font_size = 80
+        MENU_TEXT = pg.font.Font(font_name, font_size).render("Clicker: MSU edition", True, BLACK)
+        MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.12 * DISPLAY_HEIGHT))
         
         PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT), 
                              text_input="PLAY", font_size=48)
