@@ -11,6 +11,8 @@ except:
 from os import path, listdir
 import threading
 import asyncio
+import sys
+
 
 
 """ Play screen:
@@ -38,14 +40,6 @@ LIGHT_BLUE = (173, 216, 230)
 GREEN = (0, 255, 0)
 WHITE = (255,255,255)
 RED = (255,0,0)
-f_stop = None
-
-# def timer_start():
-#     threading.Timer(30.0, timer_start).start()
-#     try:
-#         asyncio.run_coroutine_threadsafe(insertion_deleting_sqlite.update_signed, bot.loop)
-#     except Exception as exc:
-#         pass
 
 
 
@@ -190,6 +184,8 @@ class Game():
     costAutominer = 50
     ver = "0.1"
     User = None
+    f_stop = None 
+    tmp = None
 
     def autominer(self):
         """Auto adding coins if corresponding upgrade has been bought."""
@@ -331,7 +327,6 @@ class Game():
     def main_menu(self) -> None:
         """Main menu screen."""
         pg.display.set_caption("Main menu")
-        global f_stop
 
         imageSaver = ImageUploader('images')
         button_dark_blue = imageSaver.uploadImage('button_dark_blue.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
@@ -363,9 +358,11 @@ class Game():
                 USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
                 USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
                 self.gameDisplay.blit(USER_TEXT, USER_RECT)
-                if f_stop == None:
-                    f_stop = threading.Event()
-                    self.updation_of_cur_user_data(f_stop, self.User, self.coins)
+                if self.f_stop == None:
+                    print("NEW THREAD")
+                    self.f_stop = threading.Event()
+                    print("New: ", self.f_stop)
+                    self.updation_of_cur_user_data(self.User, self.coins)
 
             for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON, RATING_BUTTON]:
                 button.changeColor(MENU_MOUSE_POS, self.gameDisplay)
@@ -381,12 +378,17 @@ class Game():
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
                     if RATING_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        #print("DEBUG", self.f_stop)
+                        print("1:THREAD STOPPED: ", self.f_stop)
+                        try:
+                            self.f_stop.set()
+                            self.f_stop = None
+                            self.tmp.join()
+                        except:
+                            pass
                         self.coins, self.User = input.main_c(self.coins)
                         #stopping previous thread
-                        if self.User != None: 
-                            if f_stop != None:
-                                f_stop.set()
-                                f_stop = None
+                        #if self.User != None: 
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         continue
@@ -394,29 +396,84 @@ class Game():
             pg.display.flip()
         return
 
-    def updation_of_cur_user_data(self, f_stop, username_, coins):
-        print("Updation")
-        insertion_deleting_sqlite.update_signed(None, username_, self.coins) 
-        if not f_stop.is_set():
-            # call f() again in 10 seconds
-            threading.Timer(10, self.updation_of_cur_user_data, [f_stop , username_, self.coins]).start()
+    def updation_of_cur_user_data(self,  username_, coins):
+        if self.User != None:
+            print("Updation")
+            insertion_deleting_sqlite.update_signed(None, username_, self.coins) 
+            try:
+                if not self.f_stop.is_set():
+                    # update each 60 seconds
+                    self.tmp = threading.Timer(60, self.updation_of_cur_user_data, [ username_, self.coins])
+                    self.tmp.start()
+            except:
+                sys.exit(0)
+        else: 
+            if self.f_stop != None:
+                print("2:THREAD STOPPED: ", self.f_stop)
+                self.f_stop.set()
+                self.f_stop = None
 
     def __init__(self) -> None:
         """Start the game."""
         # Setting display
-        self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-        FONT = pg.font.Font(None, 32)
-        
-        # Music
-        self.musicPlayer = MusicUploader('music')
-        self.musicPlayer.playRandomMusic()
+        import urllib
+        try:
+            urllib.request.urlopen("http://google.com")
+            self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+            FONT = pg.font.Font(None, 32)
+            
+            # Music
+            self.musicPlayer = MusicUploader('music')
+            self.musicPlayer.playRandomMusic()
 
-        # Ininial values
-        self.running = True
+            # Ininial values
+            self.running = True
 
-        self.main_menu()
-        global f_stop
-        if f_stop != None:
-            f_stop.set()
-            f_stop = None
-        return
+            self.main_menu()
+            if self.f_stop != None:
+                self.f_stop.set()
+                self.f_stop = None
+            return
+
+        except IOError:
+            "Google is not available! Internet is broken!"
+            pg.display.set_caption("Main menu")
+            imageSaver = ImageUploader('images')
+            button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+
+            QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
+                             text_input="QUIT", font_size=48, hovering_color=BLACK)
+
+            font_name = "freesansbold.ttf" 
+            font_size = 30
+            MENU_TEXT = pg.font.Font(font_name, font_size).render("NO INTERNET! TURN IT ON, THEN RESTART", True, RED)
+            MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT//2))
+            gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+            clock = pg.time.Clock()
+            running = True
+            while running:
+                clock.tick(60)
+                gameDisplay.blit(MENU_TEXT, MENU_RECT)
+                MOUSE_POS = pg.mouse.get_pos()
+
+                for button in [QUIT_BUTTON]:
+                    button.changeColor(MOUSE_POS, gameDisplay)
+                    button.update(gameDisplay)
+
+                for event in pg.event.get():
+
+                    if event.type == pg.QUIT:
+                        running = False
+                        continue
+
+    
+          
+                    if event.type == pg.MOUSEBUTTONDOWN:
+                        
+                        if QUIT_BUTTON.checkForInput(MOUSE_POS):
+                            running = False
+                            continue
+
+                pg.display.flip()
+
+            return

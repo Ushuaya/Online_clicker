@@ -383,18 +383,13 @@ def main_c(coins = None):
                             done = not done 
                             #Next_stage = "REG_SIGN"
                             exit_module = not exit_module
-                            print(input_box1.text)
                             return coins_update, input_box1.text
 
-                #screen.fill((30, 30, 30))
                 bckgrnd_im = imageSaver.uploadImage('corona.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
                 screen.blit(bckgrnd_im, (0, 0))
-                #table_10 = eval(table_10)
                 table_10_2 = [("")]
-                print(table_10)
                 for i in range(len(table_10)): 
                     table_10_2 += [(str(i+1) + ". " + str(table_10[i][1]) + " -- " + str(table_10[i][0]))]
-                print(table_10_2)              
                 list_to_print = [("Top 10 players: ")] + table_10_2 + [("")] + [("Your place: ")] + [(pos[0][2])] +  [("Your score: ")] + [(pos[0][0])]
                 enter = 0 
                 for i in list_to_print: 
