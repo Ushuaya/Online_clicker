@@ -1,19 +1,19 @@
 """Main module."""
 
-from typing import Any
+import locale
 import pygame as pg
-import time
 import random
+import time
 from .Button import Button
 from .Option import Option_switchable, Option_slider
 from os import path, listdir
-
+from typing import Any
 
 """ Play screen:
                         DISPLAY WIDTH
         |-------------------------------------------|
-        |                                           |
-        |                                           |
+        |   coins         TITLE            home_b   |
+        |                                   opt_b   |
         |                                           |
         |                                           |
 DISPLAY |               main_click                  |
@@ -37,6 +37,13 @@ WHITE = (255,255,255)
 RED = (255,0,0)
 DARK_YELLOW = (150, 150, 30)
 GOLD = (230, 190, 85)
+
+LANGUAGES = ["Default", "English", "Russian", ]
+RESOLUTIONS = ["1024x768", "640x480", "1280x720", "1920x1080", ]
+
+LANG_TO_LOC = {"English": "en_US.UTF-8",
+               "Russian": "ru_RU.UTF-8", 
+               "Default": "", }
 
 
 class ImageUploader():
@@ -99,6 +106,10 @@ class MusicUploader():
         elif v > 1:
             pg.mixer.music.set_volume(1)
         return
+    
+    def getVolume(self) -> float:
+        """Get current volume"""
+        return pg.mixer.music.get_volume()
 
 
 class Drawing(): 
@@ -133,7 +144,6 @@ class Drawing():
         pict = random.choice(logos)
         #screen_f.blit(pict, (DISPLAY_WIDTH * 0.42, DISPLAY_HEIGHT * 0.42))
         return pict
-        
 
     def dispaylBackgroundButton(self, pos: tuple , screen_f:object = None, 
                                 button_f: object = None, button_bckgrnd_f: object = None) -> None:
@@ -141,16 +151,6 @@ class Drawing():
         if pos[0] >= DISPLAY_WIDTH * 0.42 and pos[1] >= DISPLAY_HEIGHT * 0.42 and\
            pos[0] <= DISPLAY_WIDTH * 0.545 and pos[1] <= DISPLAY_HEIGHT * 0.59:
             screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * (0.42 - 0.1), DISPLAY_HEIGHT * (0.42 - 0.125)))
-
-        #if pos[0] >= DISPLAY_WIDTH * 0.0625 and pos[1] >= DISPLAY_HEIGHT * 0.84 and\
-        #   pos[0] <= DISPLAY_WIDTH * 0.0625 + button_f.get_width() and pos[1] <= DISPLAY_HEIGHT * 0.84 + button_f.get_height():
-        #    screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * 0.0625 + button_f.get_width() // 2 - button_bckgrnd_f.get_width() // 2, 
-        #                                     DISPLAY_HEIGHT * 0.82 + button_f.get_height() // 2 - button_bckgrnd_f.get_height() // 2))
-
-        #if pos[0] >= DISPLAY_WIDTH * 0.6875 and pos[1] >= DISPLAY_HEIGHT * 0.84 and\
-        #   pos[0] <= DISPLAY_WIDTH * 0.6875 + button_f.get_width() and pos[1] <= DISPLAY_HEIGHT * 0.84 + button_f.get_height():
-        #    screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * 0.6875 + button_f.get_width() // 2 - button_bckgrnd_f.get_width() // 2,
-        #                  DISPLAY_HEIGHT * 0.82 + button_f.get_height() // 2 - button_bckgrnd_f.get_height() // 2))
 
 
 class ShiftingBackgoungnd(): 
@@ -200,6 +200,7 @@ class Game():
         button_1 = imageSaver.uploadImage('button_upgrade.png', (0.33 * DISPLAY_WIDTH, 0.13 * DISPLAY_HEIGHT))
         butn_bckrnd = imageSaver.uploadImage('button_back.png', (0.32 * DISPLAY_WIDTH, 0.42 * DISPLAY_HEIGHT))
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        button_home = imageSaver.uploadImage("home_button.png", (0.10 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT))
 
         UPGRADE_BUTTON = Button(button_1, pos=(0.20 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
                                 text_input="Upgrade clicker: {}".format(self.costUpgrade), font_size=20, 
@@ -207,6 +208,7 @@ class Game():
         AUTOMINER_BUTTON = Button(button_1, pos=(0.80 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
                                   text_input="Upgrade autominer: {}".format(self.costAutominer), font_size=20, 
                                   hovering_color=GREEN)
+        HOME_BUTTON = Button(button_home, (0.85 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT), "")
         
         # Ininial values
         shiftBackgoungnd = ShiftingBackgoungnd() 
@@ -253,12 +255,16 @@ class Game():
                             self.autog = self.autog + 0.5
                             self.costAutominer = round(self.costAutominer * 1.5, 0)
                             AUTOMINER_BUTTON.changeText("Upgrade autominer: {}".format(self.costAutominer))
+                    
+                    # if click for home
+                    elif HOME_BUTTON.checkForInput(MOUSE_POS):
+                        return
 
 
             # Func to create dynamic background
             shiftBackgoungnd.shift(self.gameDisplay, bckgrnd_im, DISPLAY_WIDTH)
 
-            for button in [UPGRADE_BUTTON, AUTOMINER_BUTTON]:
+            for button in [UPGRADE_BUTTON, AUTOMINER_BUTTON, HOME_BUTTON]:
                 button.changeColor(MOUSE_POS)
                 button.update(self.gameDisplay)
 
@@ -268,18 +274,60 @@ class Game():
             Drawer.drawText("ВМИК lif(v)e", BLACK, LIGHT_BLUE, 
                             0.5 * DISPLAY_WIDTH, 0.12 * DISPLAY_HEIGHT, 50, screen = self.gameDisplay)
             Drawer.drawText("You have: " + str(f'{self.coins:.2f}') + " coins", BLACK, LIGHT_BLUE, 
-                            0.15 * DISPLAY_WIDTH, 0.06 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
-            Drawer.drawText("Version: " + self.ver, BLACK, LIGHT_BLUE, 
-                            0.85 * DISPLAY_WIDTH, 0.06 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
+                            0.15 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
+            #Drawer.drawText("Version: " + self.ver, BLACK, LIGHT_BLUE, 
+            #                0.85 * DISPLAY_WIDTH, 0.06 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
 
             #updating 
             pg.display.flip()
         return
     
-    def apply_changes(self) -> None:
-        """Apply changes in options."""
-        print("!!!TEST SUCCESS!!!")
+    def update_locale(self) -> None:
+        new_loc = LANG_TO_LOC[self.language]
+        #print(self.language, new_loc)
+        locale.setlocale(locale.LC_ALL, new_loc)
         return
+    
+    def apply_changes(self, **kwargs) -> bool:
+        """Apply changes in options."""
+        #restart = False
+        restart = True
+        if "new_volume" in kwargs:
+            self.musicPlayer.setVolume(kwargs["new_volume"] / 100)
+            self.volume = kwargs["new_volume"]
+        if "new_language" in kwargs:
+            #restart = True
+            self.language = kwargs["new_language"]
+            self.update_locale()
+        if "new_resolution" in kwargs:
+            #restart = True
+            global DISPLAY_HEIGHT, DISPLAY_WIDTH
+            self.resolution = self.resolution_to_str(kwargs["new_resolution"])
+            DISPLAY_WIDTH = kwargs["new_resolution"][0]
+            DISPLAY_HEIGHT = kwargs["new_resolution"][1]
+            self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+            print("!!!IN new_resolution")
+        return restart
+
+    @staticmethod
+    def resolution_to_tuple(resol: str) -> tuple[int]:
+        """Cast resolution in format 'AxB' to (A, B)."""
+        A, x, B = resol.partition('x')
+        A = int(A)
+        B = int(B)
+        if x == '':
+            raise ValueError("Wrong resolution format")
+        return (A, B)
+
+    @staticmethod
+    def resolution_to_str(resol: tuple[int, int]) -> str:
+        """Cast resolution in format (A, B) to 'AxB'."""
+        return str(resol[0]) + "x" + str(resol[1])
+
+    @staticmethod
+    def get_new_resolution(resol_opt: Option_switchable) -> tuple[int]:
+        resol = resol_opt.curr_var
+        return Game.resolution_to_tuple(resol)
 
     def options(self) -> None:
         """Options menu."""
@@ -305,17 +353,20 @@ class Game():
         OPT_TEXT = pg.font.Font(font_name, font_size).render("Options", True, BLACK)
         OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT * 0.08))
 
-        LANGUAGES = ["English", "Russian", ]
-        RESOLUTIONS = ["1024x768", "640x480", "1280x720", "1920x1080", ]
         LANGUAGE_OPTION = Option_switchable("Language", (0.05 * DISPLAY_WIDTH, 0.30 * DISPLAY_HEIGHT), 
                                             panel_green, panel_yellow, button_prev, button_next, 
-                                 variants=LANGUAGES)
+                                            variants=LANGUAGES)
+        LANGUAGE_OPTION.set_curr_value(self.language)
+        
         RESOLUTION_OPTION = Option_switchable("Resolution", (0.05 * DISPLAY_WIDTH, 0.50 * DISPLAY_HEIGHT), 
                                               panel_green, panel_yellow, button_prev, button_next, 
                                               variants=RESOLUTIONS)
+        RESOLUTION_OPTION.set_curr_value(self.resolution)
+
         VOLUME_OPTION = Option_slider(self.gameDisplay, "Volume", 
                                       (0.05 * DISPLAY_WIDTH, 0.70 * DISPLAY_HEIGHT), panel_green,
-                                      0, 100, 1, slider_colour=DARK_YELLOW, handle_colour=GOLD)
+                                      0, 100, 1, slider_colour=DARK_YELLOW, handle_colour=GOLD,
+                                      initial_value=self.volume)
 
         APPLY_BUTTON = Button(button_apply, (0.30 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), "Apply",
                               font_size=46, hovering_color=LIGHT_BLUE)
@@ -323,7 +374,8 @@ class Game():
                               font_size=46, hovering_color=BLUE_GRAY)        
 
         clock = pg.time.Clock()
-        while self.running:
+        changes = dict()
+        while self.running and not self._changes_applied:
             clock.tick(FPS)
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
 
@@ -336,6 +388,7 @@ class Game():
                 button.update(self.gameDisplay)
 
             events = pg.event.get()
+            VOLUME_OPTION.update_slider(events)
             for event in events:
                 MOUSE_POS = pg.mouse.get_pos()
                 if event.type == pg.QUIT:
@@ -345,19 +398,30 @@ class Game():
                     if event.key == pg.K_ESCAPE:
                         return
                 if event.type == pg.MOUSEBUTTONDOWN:
-                    LANGUAGE_OPTION.switch_mb(MOUSE_POS)
-                    RESOLUTION_OPTION.switch_mb(MOUSE_POS)
+                    if LANGUAGE_OPTION.switch_mb(MOUSE_POS):
+                        changes["new_language"] = LANGUAGE_OPTION.curr_var
+                    if RESOLUTION_OPTION.switch_mb(MOUSE_POS):
+                        changes["new_resolution"] = self.get_new_resolution(RESOLUTION_OPTION)
                     if BACK_BUTTON.checkForInput(MOUSE_POS):
                         return
                     if APPLY_BUTTON.checkForInput(MOUSE_POS):
-                        self.apply_changes()
+                        changes["new_volume"] = VOLUME_OPTION.get_value()
+                        VOLUME_OPTION.slider.hide()
+                        VOLUME_OPTION.output.hide()
+                        self._changes_applied = self.apply_changes(**changes)
+                        # Bug in pygame-widgets: old Sliders and TextBoxes are not removed from screen
+                        
 
                 # If current music ends
                 elif event.type == self.musicPlayer.SONG_END:
                     self.musicPlayer.playRandomMusic()
             
-            VOLUME_OPTION.update_slider(events)
             pg.display.flip()
+
+        #if self._changes_applied:
+        #    self._changes_applied = False
+        #    self.options()
+        
         return
 
 
@@ -383,7 +447,7 @@ class Game():
                              text_input="QUIT", font_size=48, hovering_color=BLACK)
         
         clock = pg.time.Clock()
-        while self.running:
+        while self.running and not self._reset_screen:
             clock.tick(FPS)
 
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
@@ -403,13 +467,16 @@ class Game():
                         self.play()
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
+                        if self._changes_applied:
+                            self._changes_applied = False
+                            self._reset_screen = True
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         continue
                 # If current music ends
                 elif event.type == self.musicPlayer.SONG_END:
                     self.musicPlayer.playRandomMusic()
-
+            
             pg.display.flip()
         return
 
@@ -422,8 +489,16 @@ class Game():
         self.musicPlayer = MusicUploader('music')
         self.musicPlayer.playRandomMusic()
 
-        # Ininial values
+        # Ininial values and default values
         self.running = True
+        self._changes_applied = False
+        self._reset_screen = True   # initially True but set to False during launch
+        self.language = LANGUAGES[0]
+        self.update_locale()
+        self.resolution = RESOLUTIONS[0]
+        self.volume = int(self.musicPlayer.getVolume() * 100)  
 
-        self.main_menu()
+        while self._reset_screen:
+            self._reset_screen = False
+            self.main_menu()
         return

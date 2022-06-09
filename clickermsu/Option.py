@@ -136,14 +136,30 @@ class Option_switchable(Option):
         self.curr_var = self.variants[0]
         self.curr_var_text = self.font.render(self.curr_var, True, WHITE)
 
-    def switch_mb(self, position: tuple[int]) -> None:
-        """Check if position corresponds to switch buttons and if it is then switch."""
+    def switch_mb(self, position: tuple[int]) -> bool:
+        """Check if position corresponds to switch buttons and if it is then switch.
+        
+        params:
+            position - tuple[int], position to check
+        returns:
+            True if switched, False otherwise
+        """
         if self.check_for_switch_prev(position):
             self.switch_prev()
-            return
+            return True
         if self.check_for_switch_next(position):
             self.switch_next()
-            return
+            return True
+        return False
+
+    def set_curr_value(self, value: str) -> None:
+        """Set current value for option."""
+        if value not in self.variants:
+            raise ValueError(f"Wrong value for option: {self.opt_name}")
+        while value != self.variants[0]:
+            self.variants.rotate(-1)
+        self.curr_var = self.variants[0]
+        self.curr_var_text = self.font.render(self.curr_var, True, WHITE)
         return
 
 
@@ -225,6 +241,11 @@ class Option_slider(Option):
     def get_value(self) -> int:
         """Get slider's value."""
         return self.slider.getValue()
+    
+    def set_value(self, val: int) -> None:
+        """Set value for slider."""
+        self.slider.value = val
+        return
     
     def update_slider(self, events: list[pg.event.Event]) -> None:
         """Update slider"""
