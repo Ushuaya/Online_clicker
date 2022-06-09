@@ -5,7 +5,7 @@ import pygame as pg
 import time
 import random
 from .Button import Button
-from .Option import Option_switchable
+from .Option import Option_switchable, Option_slider
 from os import path, listdir
 
 
@@ -34,6 +34,8 @@ LIGHT_BLUE = (173, 216, 230)
 GREEN = (0, 255, 0)
 WHITE = (255,255,255)
 RED = (255,0,0)
+DARK_YELLOW = (150, 150, 30)
+GOLD = (230, 190, 85)
 
 
 class ImageUploader():
@@ -301,7 +303,9 @@ class Game():
         RESOLUTION_OPTION = Option_switchable("Resolution", (0.05 * DISPLAY_WIDTH, 0.40 * DISPLAY_HEIGHT), 
                                               panel_green, panel_yellow, button_prev, button_next, 
                                               variants=RESOLUTIONS)
-
+        VOLUME_OPTION = Option_slider(self.gameDisplay, "Volume", 
+                                      (0.05 * DISPLAY_WIDTH, 0.60 * DISPLAY_HEIGHT), panel_green,
+                                      0, 100, 1, slider_colour=DARK_YELLOW, handle_colour=GOLD)
 
         clock = pg.time.Clock()
         while self.running:
@@ -309,10 +313,11 @@ class Game():
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
 
             #self.gameDisplay.blit(OPT_TEXT, OPT_RECT)
-            for option in [LANGUAGE_OPTION, RESOLUTION_OPTION, ]:
+            for option in [LANGUAGE_OPTION, RESOLUTION_OPTION, VOLUME_OPTION]:
                 option.update(self.gameDisplay)
 
-            for event in pg.event.get():
+            events = pg.event.get()
+            for event in events:
                 MOUSE_POS = pg.mouse.get_pos()
                 if event.type == pg.QUIT:
                     self.running = False
@@ -327,6 +332,7 @@ class Game():
                 elif event.type == self.musicPlayer.SONG_END:
                     self.musicPlayer.playRandomMusic()
             
+            VOLUME_OPTION.update_slider(events)
             pg.display.flip()
         return
 
