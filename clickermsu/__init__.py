@@ -6,6 +6,12 @@ import time
 import random
 from .Button import Button
 from .Option import Option_switchable
+from . import input
+#print("this: ", dir(input))
+#try:
+#    from .Button import Button
+#except:
+#    from Button import Button
 from os import path, listdir
 
 
@@ -197,12 +203,18 @@ class Game():
         button_1 = imageSaver.uploadImage('button_upgrade.png', (0.33 * DISPLAY_WIDTH, 0.13 * DISPLAY_HEIGHT))
         butn_bckrnd = imageSaver.uploadImage('button_back.png', (0.32 * DISPLAY_WIDTH, 0.42 * DISPLAY_HEIGHT))
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        menu_bitton = imageSaver.uploadImage('button_dark_blue.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+
 
         UPGRADE_BUTTON = Button(button_1, pos=(0.20 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
                                 text_input="Upgrade clicker: {}".format(self.costUpgrade), font_size=20, 
                                 hovering_color=GREEN)
         AUTOMINER_BUTTON = Button(button_1, pos=(0.80 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
                                   text_input="Upgrade autominer: {}".format(self.costAutominer), font_size=20, 
+                                  hovering_color=GREEN)
+
+        MENU_BUTTON = Button(menu_bitton, pos=(0.5 * DISPLAY_WIDTH, 0.2 * DISPLAY_HEIGHT), 
+                                  text_input="MENU", font_size=30, 
                                   hovering_color=GREEN)
         
         # Ininial values
@@ -251,11 +263,15 @@ class Game():
                             self.costAutominer = round(self.costAutominer * 1.5, 0)
                             AUTOMINER_BUTTON.changeText("Upgrade autominer: {}".format(self.costAutominer))
 
+                    # if click for menu
+                    elif MENU_BUTTON.checkForInput(MOUSE_POS):
+                        return
+
 
             # Func to create dynamic background
             shiftBackgoungnd.shift(self.gameDisplay, bckgrnd_im, DISPLAY_WIDTH)
 
-            for button in [UPGRADE_BUTTON, AUTOMINER_BUTTON]:
+            for button in [UPGRADE_BUTTON, AUTOMINER_BUTTON, MENU_BUTTON]:
                 button.changeColor(MOUSE_POS)
                 button.update(self.gameDisplay)
 
@@ -344,9 +360,11 @@ class Game():
         
         PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT), 
                              text_input="PLAY", font_size=48)
-        OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.55 * DISPLAY_HEIGHT), 
+        OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.48 * DISPLAY_HEIGHT), 
                                 text_input="OPTIONS", font_size=48)
-        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.77 * DISPLAY_HEIGHT), 
+        RATING_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.63 * DISPLAY_HEIGHT), 
+                             text_input="SAVE & RATING", font_size=38, hovering_color=BLACK)
+        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
                              text_input="QUIT", font_size=48, hovering_color=BLACK)
         
         clock = pg.time.Clock()
@@ -357,7 +375,7 @@ class Game():
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
 
-            for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+            for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON, RATING_BUTTON]:
                 button.changeColor(MENU_MOUSE_POS)
                 button.update(self.gameDisplay)
             
@@ -370,6 +388,8 @@ class Game():
                         self.play()
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
+                    if RATING_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        self.coins = input.main_c(self.coins)
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         continue
@@ -381,7 +401,8 @@ class Game():
         """Start the game."""
         # Setting display
         self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-
+        FONT = pg.font.Font(None, 32)
+        
         # Music
         self.musicPlayer = MusicUploader('music')
         self.musicPlayer.playRandomMusic()
