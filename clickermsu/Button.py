@@ -1,17 +1,26 @@
 """Module containing Button class.
-source: https://github.com/baraltech/Menu-System-PyGame/blob/main/button.pyS
+Original source: https://github.com/baraltech/Menu-System-PyGame/blob/main/button.pyS
 """
+from typing import Any
 import pygame.font
-from pygame import Surface
+from pygame import Surface, Rect
 
 WHITE = (255,255,255)
 RED = (255,0,0)
 
-class Button():
+class Button:
     def __init__(self, image: Surface, pos: tuple[int], text_input: str, 
                  font_name: str = "freesansbold.ttf", font_size: int = 20,
-                 base_color: tuple[int] = WHITE, hovering_color: tuple[int] = RED, tipper: list = None):
-        """Create a button."""
+                 base_color: tuple[int] = WHITE, hovering_color: tuple[int] = RED, 
+                 tipper: list = None):
+        """Create a button.
+        
+        params:
+            image - pg.Surface,
+            pos - tuple[int], center's position
+            text_input - str,
+            font_name - str,
+       """
         self.image = image
         self.x_pos = pos[0]
         self.y_pos = pos[1]
@@ -22,7 +31,7 @@ class Button():
         if self.image is None:
             self.image = self.text
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
-        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+        self.text_rect = self.text.get_rect(center=self.rect.center)
         self.tip = tipper
 
     def update(self, screen: Surface) -> None:
@@ -33,13 +42,12 @@ class Button():
 
     def checkForInput(self, position: tuple[int]) -> bool:
         """Check if possition corresponds to button."""
-        return self.rect.left <= position[0] <= self.rect.right and\
-               self.rect.top <= position[1] <= self.rect.bottom
-
+        return self.rect.collidepoint(position)
+            
     def changeText(self, new_text: str) -> None:
         self.text_input = new_text
         self.text = self.font.render(self.text_input, True, self.base_color)
-        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+        self.text_rect = self.text.get_rect(center=self.rect.center)
 
     def changeColor(self, position: tuple[int], screen: Surface = None) -> None:
         """Change button's text color if position in button's range."""
@@ -53,5 +61,16 @@ class Button():
                     step += abs(self.text_rect.top - self.text_rect.bottom)
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
+    
+    def get_rect(self) -> Rect:
+        return self.rect
 
+    def set_pos(self, **kwargs: Any) -> None:
+        """Set new position for image.
         
+        params:
+            kwargs from Surface.get_rect
+        """
+        self.rect = self.image.get_rect(**kwargs)
+        self.text_rect.center = self.rect.center
+        self.x_pos, self.y_pos = self.rect.center
