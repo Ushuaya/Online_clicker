@@ -101,6 +101,7 @@ def main_c(coins = None):
                     if event.type == pg.QUIT:
                         done = True
                         exit_module = True
+                        return coins, None
 
                     elif event.type == pg.MOUSEBUTTONDOWN:
                             mopos = pg.mouse.get_pos()
