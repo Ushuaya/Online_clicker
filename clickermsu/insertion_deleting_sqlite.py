@@ -173,7 +173,7 @@ def register(messg, username_in = None, password_in = None, coins = None):
     if name_out is None: 
         if password_in == None or password_in == "": 
             return 2, None
-        cursor.execute("INSERT INTO login_id (id, username, password) VALUES (?, ?, ?);", (coins, username_in, password_in))
+        cursor.execute("INSERT INTO login_id (id, username, password) VALUES (?, ?, ?);", (0, username_in, password_in))
         connect.commit() 
         print("Done")
         update_data(None)
@@ -221,8 +221,10 @@ def update_signed(messg, username_in = None, coins = None):
     print(score_out)
 
     #updating
+
     cursor.execute(f"DELETE FROM login_id WHERE username = (?)", (username_in,))
     cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", [[int(score_out), str(score[1]), str(score[2])]])
+    #cursor.execute(f"DELETE FROM login_id WHERE id >= (?);", (0,))
     connect.commit() 
     update_data(None)
     return 
