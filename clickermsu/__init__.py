@@ -20,7 +20,7 @@ import sys
                         DISPLAY WIDTH
         |-------------------------------------------|
         |   coins         TITLE            home_b   |
-        |                                   opt_b   |
+        |                                           |
         |                                           |
         |                                           |
 DISPLAY |               main_click                  |
@@ -150,7 +150,6 @@ class Drawing():
     def newImageAfterClick(self, logos: tuple) -> None:
         """Change of the main-click logo. There is random probabilty of changing the logo."""
         pict = random.choice(logos)
-        #screen_f.blit(pict, (DISPLAY_WIDTH * 0.42, DISPLAY_HEIGHT * 0.42))
         return pict
 
     def dispaylBackgroundButton(self, pos: tuple , screen_f:object = None, 
@@ -316,7 +315,6 @@ class Game():
             DISPLAY_WIDTH = kwargs["new_resolution"][0]
             DISPLAY_HEIGHT = kwargs["new_resolution"][1]
             self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-            print("!!!IN new_resolution")
         return restart
 
     @staticmethod
@@ -458,16 +456,6 @@ class Game():
             self.gameDisplay.blit(bckgrnd_im, (0, 0))
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
-            
-            # if self.User != None: 
-            #     USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
-            #     USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
-            #     self.gameDisplay.blit(USER_TEXT, USER_RECT)
-            #     if self.f_stop == None:
-            #         print("NEW THREAD")
-            #         self.f_stop = threading.Event()
-            #         print("New: ", self.f_stop)
-            #         self.updation_of_cur_user_data(self.User, self.coins)
 
             if self.User != None: 
                 USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
@@ -501,14 +489,12 @@ class Game():
                         except:
                             pass
 
-
-
-
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
                         if self._changes_applied:
                             self._changes_applied = False
                             self._reset_screen = True
+
                     if RATING_BUTTON.checkForInput(MENU_MOUSE_POS):
                         #print("DEBUG", self.f_stop)
                         print("1:THREAD STOPPED: ", self.f_stop)
@@ -519,8 +505,7 @@ class Game():
                         except:
                             pass
                         self.coins, self.User = input.main_c(self.coins, d_w = DISPLAY_WIDTH, d_h = DISPLAY_HEIGHT)
-                        #stopping previous thread
-                        #if self.User != None: 
+
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
                         try:
@@ -554,6 +539,47 @@ class Game():
                 print("2:THREAD STOPPED: ", self.f_stop)
                 self.f_stop.set()
                 self.f_stop = None
+
+    def internet_error(self) -> None:
+        """Screen for displaying Internet connection error."""
+        pg.display.set_caption("Main menu")
+        imageSaver = ImageUploader('images')
+        button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+
+        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
+                            text_input="QUIT", font_size=48, hovering_color=BLACK)
+
+        font_name = "freesansbold.ttf" 
+        font_size = 30
+        MENU_TEXT = pg.font.Font(font_name, font_size).render("NO INTERNET! TURN IT ON, THEN RESTART", True, RED)
+        MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT//2))
+        gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        clock = pg.time.Clock()
+        running = True
+        while running:
+            clock.tick(FPS)
+            gameDisplay.blit(MENU_TEXT, MENU_RECT)
+            MOUSE_POS = pg.mouse.get_pos()
+
+            for button in [QUIT_BUTTON]:
+                button.changeColor(MOUSE_POS, gameDisplay)
+                button.update(gameDisplay)
+
+            for event in pg.event.get():
+
+                if event.type == pg.QUIT:
+                    running = False
+                    continue
+
+
+        
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    
+                    if QUIT_BUTTON.checkForInput(MOUSE_POS):
+                        running = False
+                        continue
+
+            pg.display.flip()
 
     def __init__(self) -> None:
         """Start the game."""
@@ -591,44 +617,6 @@ class Game():
 
         except IOError:
             "Google is not available! Internet is broken!"
-            pg.display.set_caption("Main menu")
-            imageSaver = ImageUploader('images')
-            button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
-
-            QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
-                             text_input="QUIT", font_size=48, hovering_color=BLACK)
-
-            font_name = "freesansbold.ttf" 
-            font_size = 30
-            MENU_TEXT = pg.font.Font(font_name, font_size).render("NO INTERNET! TURN IT ON, THEN RESTART", True, RED)
-            MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT//2))
-            gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-            clock = pg.time.Clock()
-            running = True
-            while running:
-                clock.tick(60)
-                gameDisplay.blit(MENU_TEXT, MENU_RECT)
-                MOUSE_POS = pg.mouse.get_pos()
-
-                for button in [QUIT_BUTTON]:
-                    button.changeColor(MOUSE_POS, gameDisplay)
-                    button.update(gameDisplay)
-
-                for event in pg.event.get():
-
-                    if event.type == pg.QUIT:
-                        running = False
-                        continue
-
-    
-          
-                    if event.type == pg.MOUSEBUTTONDOWN:
-                        
-                        if QUIT_BUTTON.checkForInput(MOUSE_POS):
-                            running = False
-                            continue
-
-                pg.display.flip()
-
+            self.internet_error()
             return
         

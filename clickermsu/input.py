@@ -144,17 +144,6 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                     button.changeColor(MOUSE_POS, screen)
                     button.update(screen)
 
-                # screen.blit(button_1, (DISPLAY_WIDTH*0.1, 0.1 * DISPLAY_HEIGHT))
-                # Drawer2.drawText("Registration" , (0, 0, 0), None, 
-                #                     DISPLAY_WIDTH*0.25, 0.16 * DISPLAY_HEIGHT, 20, screen = screen)
-                # screen.blit(button_1, (DISPLAY_WIDTH*0.6, 0.1 * DISPLAY_HEIGHT))
-                # Drawer2.drawText("Sign in" , (0, 0, 0), None, 
-                #                     DISPLAY_WIDTH*0.75, 0.16 * DISPLAY_HEIGHT, 20, screen = screen)
-
-                # screen.blit(button_1, (DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.8))
-                # Drawer2.drawText("BACK" , (0, 0, 0), None, 
-                #                 DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
-
                 pg.display.flip()
 
 
@@ -239,14 +228,6 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                     button.changeColor(MOUSE_POS)
                     button.update(screen)
 
-
-                # screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
-                # Drawer2.drawText("Register" , (0, 0, 0), None, 
-                #                 DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
-
-                # screen.blit(button_1, (DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.8))
-                # Drawer2.drawText("BACK" , (0, 0, 0), None, 
-                #                 DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
 
                 if wrong_inp: 
                     Drawer2.drawText(Error_msg , (255, 0, 0), None, 
@@ -354,15 +335,6 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                     button.changeColor(MOUSE_POS)
                     button.update(screen)
 
-
-                # screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
-                # Drawer2.drawText("Sign in" , (0, 0, 0), None, 
-                #                 DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
-
-                # screen.blit(button_1, (DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.8))
-                # Drawer2.drawText("BACK" , (0, 0, 0), None, 
-                #                 DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
-
                 if wrong_inp: 
                     Drawer2.drawText(Error_msg , (255, 0, 0), None, 
                                 DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.55, 20, screen = screen)
@@ -413,14 +385,10 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                 for button in [DONE_BUTTON]:
                     button.changeColor(MOUSE_POS)
                     button.update(screen)
-
-                # screen.blit(button_1, (DISPLAY_WIDTH * 0.6, DISPLAY_HEIGHT * 0.8))
-                # Drawer2.drawText("DONE" , (0, 0, 0), None, 
-                #                 DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87, 20, screen = screen)
                                 
                 pg.display.flip()
 
 if __name__ == '__main__':
-    main()
+    main_c()
     pg.quit()
 
