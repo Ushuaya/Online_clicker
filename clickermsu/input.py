@@ -4,21 +4,17 @@ from .__init__ import Drawing, ImageUploader
 from .Button import Button
 DISPLAY_WIDTH = 1024
 DISPLAY_HEIGHT = 768
+
 FPS = 60
 
 
 
-
-pg.init()
-screen = pg.display.set_mode((1024, 768))
-pg.display.set_caption("Inputer")
 COLOR_INACTIVE = pg.Color('lightskyblue3')
 COLOR_ACTIVE = pg.Color('dodgerblue2')
+pg.init()
 FONT = pg.font.Font(None, 32)
-clock = pg.time.Clock()
 
-imageSaver = ImageUploader('images')
-button_1 = imageSaver.uploadImage('button_upgrade.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+
 
 
 class InputBox:
@@ -62,16 +58,24 @@ class InputBox:
         self.rect.w = width
 
     def draw(self, screen):
-        # Blit the text.
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
-        # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 2)
 
 
 
 
-def main_c(coins = None):
-    FONT = pg.font.Font(None, 32)
+def main_c(coins = None, d_w = 1024, d_h = 768):
+    imageSaver = ImageUploader('images')
+    global DISPLAY_WIDTH
+    global DISPLAY_HEIGHT
+    button_1 = imageSaver.uploadImage('button_upgrade.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+    DISPLAY_WIDTH = d_w
+    DISPLAY_HEIGHT = d_h
+
+    screen = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+    pg.display.set_caption("Inputer")
+    clock = pg.time.Clock()
+    
     print("ok")
     clock = pg.time.Clock()
     input_box1 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.28, 140, 32)
@@ -123,10 +127,8 @@ def main_c(coins = None):
                                 return coins, None
 
                     
-                #screen.fill((30, 30, 30))
                 bckgrnd_im = imageSaver.uploadImage('sova.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
                 screen.blit(bckgrnd_im, (0, 0))
-                #screen.blit(OPT_TEXT, OPT_RECT)
                 MOUSE_POS = pg.mouse.get_pos()
                 REGISTRATION_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.2, DISPLAY_WIDTH * 0.1), 
                                 text_input="Registration", font_size=48, hovering_color=(0,0,0), tipper=["REGISTRATE TO START", "WITH CURRENT PLACE", "NEXT TIME"])
@@ -166,6 +168,7 @@ def main_c(coins = None):
                     if event.type == pg.QUIT:
                         done = True
                         exit_module = True
+                        return coins, None
 
                     elif event.type == pg.MOUSEBUTTONDOWN:
                         mopos = pg.mouse.get_pos()
@@ -263,6 +266,7 @@ def main_c(coins = None):
                     if event.type == pg.QUIT:
                         done = True
                         exit_module = True
+                        return coins, None
 
                     elif event.type == pg.MOUSEBUTTONDOWN:
                         mopos = pg.mouse.get_pos()
@@ -374,6 +378,7 @@ def main_c(coins = None):
                     if event.type == pg.QUIT:
                         done = True
                         exit_module = True
+                        return coins, None
                     
                     elif event.type == pg.MOUSEBUTTONDOWN:
                         mopos = pg.mouse.get_pos()
@@ -384,6 +389,7 @@ def main_c(coins = None):
                             done = not done 
                             #Next_stage = "REG_SIGN"
                             exit_module = not exit_module
+                            print("USER: ", input_box1.text)
                             return coins_update, input_box1.text
 
                 bckgrnd_im = imageSaver.uploadImage('corona.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))

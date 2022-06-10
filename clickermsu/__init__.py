@@ -459,15 +459,20 @@ class Game():
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
             
+            # if self.User != None: 
+            #     USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
+            #     USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
+            #     self.gameDisplay.blit(USER_TEXT, USER_RECT)
+            #     if self.f_stop == None:
+            #         print("NEW THREAD")
+            #         self.f_stop = threading.Event()
+            #         print("New: ", self.f_stop)
+            #         self.updation_of_cur_user_data(self.User, self.coins)
+
             if self.User != None: 
                 USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
                 USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
                 self.gameDisplay.blit(USER_TEXT, USER_RECT)
-                if self.f_stop == None:
-                    print("NEW THREAD")
-                    self.f_stop = threading.Event()
-                    print("New: ", self.f_stop)
-                    self.updation_of_cur_user_data(self.User, self.coins)
 
             for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON, RATING_BUTTON]:
                 button.changeColor(MENU_MOUSE_POS, self.gameDisplay)
@@ -479,7 +484,26 @@ class Game():
                     continue
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        # starting updatign of coins with server
+                        if self.User != None: 
+                            if self.f_stop == None:
+                                print("NEW THREAD")
+                                self.f_stop = threading.Event()
+                                print("New: ", self.f_stop)
+                                self.updation_of_cur_user_data(self.User, self.coins)
                         self.play()
+                        # killing thread
+                        try:
+                            self.f_stop.set()
+                            print("3:THREAD STOPPED: ", self.f_stop)
+                            self.f_stop = None
+                            self.tmp.join()
+                        except:
+                            pass
+
+
+
+
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
                         if self._changes_applied:
@@ -494,11 +518,18 @@ class Game():
                             self.tmp.join()
                         except:
                             pass
-                        self.coins, self.User = input.main_c(self.coins)
+                        self.coins, self.User = input.main_c(self.coins, d_w = DISPLAY_WIDTH, d_h = DISPLAY_HEIGHT)
                         #stopping previous thread
                         #if self.User != None: 
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.running = False
+                        try:
+                            self.f_stop.set()
+                            self.f_stop = None
+                            self.tmp.join()
+                            print("3:THREAD STOPPED: ", self.f_stop)
+                        except:
+                            pass
                         continue
                 # If current music ends
                 elif event.type == self.musicPlayer.SONG_END:
@@ -514,7 +545,7 @@ class Game():
             try:
                 if not self.f_stop.is_set():
                     # update each 60 seconds
-                    self.tmp = threading.Timer(60, self.updation_of_cur_user_data, [ username_, self.coins])
+                    self.tmp = threading.Timer(5, self.updation_of_cur_user_data, [ username_, self.coins])
                     self.tmp.start()
             except:
                 sys.exit(0)
