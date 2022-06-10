@@ -1,3 +1,6 @@
+"""Module of registration procedure."""
+
+
 import pygame as pg
 from .insertion_deleting_sqlite import register, sighin
 from .__init__ import Drawing, ImageUploader
@@ -12,8 +15,10 @@ FONT = pg.font.Font(None, 32)
 
 
 class InputBox:
+    """Class to create input boxes."""
 
-    def __init__(self, x, y, w, h, text=''):
+    def __init__(self, x: int, y: int, w: int, h: int, text: str = '') -> None:
+        """Initialize set ups."""
         self.rect = pg.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
@@ -22,7 +27,8 @@ class InputBox:
         self.print = ""
         self.password = False
 
-    def handle_event(self, event):
+    def handle_event(self, event: pg.event) -> None:
+        """Toggle action of input box."""
         if event.type == pg.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.
             if self.rect.collidepoint(event.pos):
@@ -39,20 +45,23 @@ class InputBox:
                 else:
                     if event.unicode != " ":
                         self.text += event.unicode
-                self.txt_surface = FONT.render("*"*len(self.text) if self.password is True
+                self.txt_surface = FONT.render("*" * len(self.text) if self.password is True
                                                else self.text, True, self.color)
 
     def update(self):
+        """Update input box."""
         # Resize the box if the text is too long.
-        width = max(200, self.txt_surface.get_width()+10)
+        width = max(200, self.txt_surface.get_width() + 10)
         self.rect.w = width
 
-    def draw(self, screen):
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+    def draw(self, screen: pg.Surface) -> None:
+        """Draw input box."""
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
         pg.draw.rect(screen, self.color, self.rect, 2)
 
 
-def main_c(coins=None, d_w=1024, d_h=768):
+def main_c(coins=None, d_w: int = 1024, d_h: int = 768) -> list:
+    """Try main cycle of registration module."""
     imageSaver = ImageUploader('images')
     global DISPLAY_WIDTH
     global DISPLAY_HEIGHT
@@ -65,11 +74,11 @@ def main_c(coins=None, d_w=1024, d_h=768):
     clock = pg.time.Clock()
 
     clock = pg.time.Clock()
-    input_box1 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.28, 140, 32)
+    input_box1 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.28, 140, 32)
     input_box1.password = False
-    input_box2 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.35, 140, 32)
+    input_box2 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.35, 140, 32)
     input_box2.password = True
-    input_box3 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT*0.42, 140, 32)
+    input_box3 = InputBox(DISPLAY_WIDTH * 0.3, DISPLAY_HEIGHT * 0.42, 140, 32)
     input_box3.password = True
     input_boxes = [input_box1, input_box2]
     input_boxes_registration = [input_box1, input_box2, input_box3]
@@ -346,13 +355,13 @@ def main_c(coins=None, d_w=1024, d_h=768):
                 screen.blit(bckgrnd_im, (0, 0))
                 table_10_2 = [("")]
                 for i in range(len(table_10)):
-                    table_10_2 += [(str(i+1) + ". " + str(table_10[i][1]) + " -- " + str(table_10[i][0]))]
+                    table_10_2 += [(str(i + 1) + ". " + str(table_10[i][1]) + " -- " + str(table_10[i][0]))]
                 list_to_print = [("Top 10 players: ")] + table_10_2 + [("")] +\
                                 [("Your place: ")] + [(pos[0][2])] + [("Your score: ")] + [(pos[0][0])]
                 enter = 0
                 for i in list_to_print:
                     Drawer2.drawText(str(i), (50, 100, 11), None,
-                                     DISPLAY_WIDTH//2, DISPLAY_HEIGHT//5+enter, 25, screen=screen)
+                                     DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 5 + enter, 25, screen=screen)
                     enter += 30
 
                 MOUSE_POS = pg.mouse.get_pos()
