@@ -207,13 +207,13 @@ def main_c(coins=None, d_w: int = 1024, d_h: int = 768) -> list:
                 for box in input_boxes_registration:
                     box.draw(screen)
 
-                Drawer2.drawText(_("Username: "), (0, 0, 0), None,
+                Drawer2.drawText(_("Username: "), BLACK, None,
                                  DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.3, 20, screen=screen)
 
-                Drawer2.drawText(_("Password: "), (0, 0, 0), None,
+                Drawer2.drawText(_("Password: "), BLACK, None,
                                  DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.37, 20, screen=screen)
 
-                Drawer2.drawText(_("Password again: "), (0, 0, 0), None,
+                Drawer2.drawText(_("Password again: "), BLACK, None,
                                  DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.44, 20, screen=screen)
 
                 MOUSE_POS = pg.mouse.get_pos()
