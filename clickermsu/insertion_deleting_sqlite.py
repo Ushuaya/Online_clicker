@@ -2,7 +2,10 @@
 
 import sqlite3
 import telebot
-from .restricted_area import token_crypto
+try:
+    from .restricted_area import token_crypto
+except Exception:
+    from restricted_area import token_crypto
 import io
 import json
 import urllib
@@ -83,9 +86,11 @@ def update_data(messg):
                                            media=telebot.types.InputMediaDocument(io.StringIO(str_data)))
         global global_file_id
         global_file_id = edit_file.document.file_id
+        return True
 
     except Exception as ex:
         print(ex)
+        return False
 
 
 @bot.message_handler(commands=["save"])
@@ -109,14 +114,14 @@ def save_data(messg):
     str_data = json.dumps(data)
     send_document = bot.send_document(messg.chat.id, io.StringIO(str_data))
     bot.send_message(messg.chat.id, 'admin_id = {}'.format(messg.chat.id))
-    bot.send_message(messg.chat.id, 'config_id = {}'.format(messg.message_id+1))
+    bot.send_message(messg.chat.id, 'config_id = {}'.format(messg.message_id + 1))
     admin_id = messg.chat.id
-    config_id = messg.message_id+1
+    config_id = messg.message_id + 1
     global global_data_chat
     global global_data_message
     global global_file_id
     global_data_chat = messg.chat.id
-    global_data_message = messg.message_id+1
+    global_data_message = messg.message_id + 1
     global_file_id = send_document.document.file_id
     bot.send_message(messg.chat.id, 'file_id = {}'.format(global_file_id))
 
@@ -136,14 +141,14 @@ def save_data(messg):
 def register(messg, username_in: str = None, password_in: str = None, coins: int = None) -> list:
     """Try to registrate new user in database.
 
-        params:
-            username_in - user name
-            password_in - user password
-            coins - user coins
+    params:
+        username_in - user name
+        password_in - user password
+        coins - user coins
 
-        returns:
-            top 10 table
-            user's place
+    returns:
+        top 10 table
+        user's place
     """
     # server case
     connect = sqlite3.connect('users.db')
@@ -199,55 +204,58 @@ def register(messg, username_in: str = None, password_in: str = None, coins: int
 def update_signed(messg, username_in: str = None, coins: int = None) -> None:
     """Try to update data of sighned user.
 
-        params:
-            username_in - user name
-            password_in - user password
-            coins - user coins
+    params:
+        username_in - user name
+        password_in - user password
+        coins - user coins
     """
     # server case
-    connect = sqlite3.connect('users.db')
-    cursor = connect.cursor()
     try:
-        cursor.execute("DROP TABLE login_id;")
+        connect = sqlite3.connect('users.db')
+        cursor = connect.cursor()
+        try:
+            cursor.execute("DROP TABLE login_id;")
+        except Exception:
+            pass
+        cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);")
+        data = get_data()
+        cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
+        connect.commit()
+
+        # local case
+        # connect = sqlite3.connect('users.db')
+        # cursor = connect.cursor()
+        # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);")
+        # connect.commit()
+
+        cursor.execute("SELECT id, username, password FROM login_id WHERE username = (?)", (username_in,))
+        score = cursor.fetchone()
+        score_out = max(score[0], coins)
+        print(score_out)
+
+        # updating
+        cursor.execute("DELETE FROM login_id WHERE username = (?)", (username_in,))
+        cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", [[int(score_out), str(score[1]), str(score[2])]])
+        connect.commit()
+        update_data(None)
+        return True
     except Exception:
-        pass
-    cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);")
-    data = get_data()
-    cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", data)
-    connect.commit()
-
-    # local case
-    # connect = sqlite3.connect('users.db')
-    # cursor = connect.cursor()
-    # cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);")
-    # connect.commit()
-
-    cursor.execute("SELECT id, username, password FROM login_id WHERE username = (?)", (username_in,))
-    score = cursor.fetchone()
-    score_out = max(score[0], coins)
-    print(score_out)
-
-    # updating
-    cursor.execute("DELETE FROM login_id WHERE username = (?)", (username_in,))
-    cursor.executemany("INSERT INTO login_id VALUES (?,?,?)", [[int(score_out), str(score[1]), str(score[2])]])
-    connect.commit()
-    update_data(None)
-    return
+        return False
 
 
 @bot.message_handler(commands=["sighin"])
 def sighin(messg, username_in: str = None, password_in: str = None, coins: int = None) -> list:
     """Try to log in user in database.
 
-        params:
-            username_in - user name
-            password_in - user password
-            coins - user coins
+    params:
+        username_in - user name
+        password_in - user password
+        coins - user coins
 
-        returns:
-            top 10 table
-            user's place
-            score to implement
+    returns:
+        top 10 table
+        user's place
+        score to implement
     """
     # server case
     connect = sqlite3.connect('users.db')
@@ -271,7 +279,6 @@ def sighin(messg, username_in: str = None, password_in: str = None, coins: int =
     if username_in is None or username_in == "":
         # User didn't specify username
         return 4, None, coins
-        username_in = str(input("username: "))
     cursor.execute("SELECT username, password FROM login_id WHERE username = ?", (username_in,))
     name_out = cursor.fetchone()
     if name_out is None:
@@ -330,13 +337,13 @@ def delete(messg):
     people_id_data = cursor.fetchone()
 
     if people_id_data is None:
-        bot.send_message(messg.chat.id, "NO SUCH USER IN DATABASE")
+        # bot.send_message(messg.chat.id, "NO SUCH USER IN DATABASE")
+        return False
     else:
         cursor.execute(f"DELETE FROM login_id WHERE id = {people_id}")
-        bot.send_message(messg.chat.id, f"Deleted user {people_id}")
+        # bot.send_message(messg.chat.id, f"Deleted user {people_id}")
         connect.commit()
-
-    connect.commit()
+        return True
 
 # bot.set_update_listener(listener)
 # bot.polling()
