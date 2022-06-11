@@ -79,18 +79,26 @@ LANG_TO_LOC = {"English": set_eng_language,
 class ImageUploader():
     """I Image uploader."""
 
-    def __init__(self, dir):
-        """Try Init image uploader associated with the <dir> directiry."""
+    def __init__(self, dir: str) -> None:
+        """Try Init image uploader associated with the <dir> directiry.
+
+        :param dir: image size to scale to
+        :type dir: str
+
+        :return: None
+        """
         self.img_dir = path.join(path.dirname(__file__), dir)
 
     def uploadImage(self, name: str, size: tuple) -> pg.Surface:
         """Try Upload image from self.img_dir folder.
 
-        params:
-            name - image name
-            size - image size to scale to
-        returns:
-            pg.Surface object - loaded and scaled image
+        :param name: image name
+        :type name: str
+
+        :param size: image size to scale to
+        :type size: tuple
+
+        :return: pg.Surface
         """
         if name.find(".png") == -1:
             tmp = pg.image.load(path.join(self.img_dir, name)).convert()          # if not png
@@ -105,17 +113,23 @@ class MusicUploader():
 
     SONG_END = pg.USEREVENT + 1
 
-    def __init__(self, dir):
-        """Init music uploader associated with <dir> directiry."""
+    def __init__(self, dir) -> None:
+        """Init music uploader associated with <dir> directiry.
+        
+        :param name: name of music, that will be implemented on next step.
+        :type name: str
+
+        :return: None
+        """        
         self.sound_dir = path.join(path.dirname(__file__), dir)
 
-    def uploadMusic(self, name: str):
+    def uploadMusic(self, name: str) -> None:
         """Upload music from self.sound_dir folder.
 
-        params:
-            name - music name
-        returns:
-            None
+        :param name: name of music, that will be implemented on next step.
+        :type name: str
+
+        :return: None
         """
         pg.mixer.music.load(path.join(self.sound_dir, name))
         return None
@@ -152,17 +166,34 @@ class Drawing():
         """
         Draw text on the main screen.
 
-        params:
-            text - the text, that will be implemented to the main screen.
-            textColor - colour of the text,
-            rectColor - ...,
-            x, y - position of the left-highest angle,
-            fsize - size of text,
-            shift_1 -- shift of the text window in pixels on the x axis,
-            shift_2 -- shift of the text window in pixels on the y axis
-            font_name - str, text font to use
-        returns:
-            None
+        :param text: the text, that will be implemented to the main screen.
+        :type text: str
+
+        :param textColor:  colour of the text
+        :type textColor:  tuple
+
+        :param rectColor:  rectangle color
+        :type rectColor: tuple
+
+        :param x: position of the leftangle
+        :type x: int
+
+        :param y: position of the right angle
+        :type y: int
+
+        :param fsize:  size of text
+        :type fsize:  int
+
+        :param shift_1:  shift of the text window in pixels on the x axis
+        :type shift_1: int
+
+        :param shift_2:  shift of the text window in pixels on the y axis
+        :type shift_2: int
+
+        :param font_name:  text font to use
+        :type font_name: str
+
+        :return: None
         """
         font = pg.font.Font(font_name, fsize)
         text = font.render(text, True, textColor, rectColor)
@@ -172,13 +203,31 @@ class Drawing():
         return
 
     def newImageAfterClick(self, logos: tuple) -> None:
-        """Change of the main-click logo. There is random probabilty of changing the logo."""
+        """Change of the main-click logo. There is random probabilty of changing the logo.
+        
+        :param logos:  new logo to show
+        :type logos: tuple
+
+        :return: None
+        """
         pict = random.choice(logos)
         return pict
 
     def dispaylBackgroundButton(self, pos: tuple, screen_f: object = None,
-                                button_f: object = None, button_bckgrnd_f: object = None) -> None:
-        """Create the background of button when the cursor moves above it."""
+                                button_bckgrnd_f: object = None) -> None:
+        """Create the background of button when the cursor moves above it.
+
+        :param pos: position of button.
+        :type pos: tuple
+
+        :param screen_f:  screen where to draw
+        :type screen_f:  pg.Surface
+
+        :param button_bckgrnd_f: button background to draw
+        :type button_bckgrnd_f: pg.Surface
+
+        :return: None
+        """
         if pos[0] >= DISPLAY_WIDTH * 0.42 and pos[1] >= DISPLAY_HEIGHT * 0.42 and\
            pos[0] <= DISPLAY_WIDTH * 0.545 and pos[1] <= DISPLAY_HEIGHT * 0.59:
             screen_f.blit(button_bckgrnd_f, (DISPLAY_WIDTH * (0.42 - 0.1),
@@ -187,11 +236,24 @@ class Drawing():
 
 class ShiftingBackgoungnd():
     """Create background, move it an each tick on one pixel, and other changes."""
+    
 
     cycleBack = 0
 
     def shift(self, screen_f: object, bckgrnd_im_f: object, im_len: int):
-        """Try Main function."""
+        """Try Main function.
+
+        :param screen_f: screen where to draw.
+        :type screen_f: pg.Surface
+
+        :param bckgrnd_im_f: button background to draw
+        :type bckgrnd_im_f: pg.Surface
+
+        :param im_len:  imge length
+        :type im_len:  int
+
+        :return: None
+        """
         screen_f.blit(bckgrnd_im_f, (0, 0))
         screen_f.fill((0, 0, 0))
         screen_f.blit(bckgrnd_im_f, (self.cycleBack, 0))
@@ -203,7 +265,7 @@ class ShiftingBackgoungnd():
 
 
 class Game():
-    """Try Main class, that contains game logics and execution."""
+    """Try main class, that contains game logics and execution."""
 
     coins = 0
     autog = 0
@@ -215,13 +277,19 @@ class Game():
     f_stop = None
     tmp = None
 
-    def autominer(self):
-        """Auto adding coins if corresponding upgrade has been bought."""
+    def autominer(self) -> None:
+        """Auto adding coins if corresponding upgrade has been bought.
+
+        :return: None
+        """
         time.sleep(0.1)
         self.coins = self.coins + self.autog
 
     def play(self) -> None:
-        """Play loop of the game."""
+        """Play loop of the game.
+
+        :return: None
+        """
         pg.display.set_caption("Play")
 
         # Images
@@ -301,7 +369,7 @@ class Game():
                 button.changeColor(MOUSE_POS)
                 button.update(self.gameDisplay)
 
-            Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, button_1, butn_bckrnd)
+            Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, butn_bckrnd)
             self.gameDisplay.blit(currLogo, (DISPLAY_WIDTH * 0.42, DISPLAY_HEIGHT * 0.42))
 
             Drawer.drawText("ВМИК lif(v)e", BLACK, LIGHT_BLUE,
@@ -314,12 +382,21 @@ class Game():
         return
 
     def update_locale(self) -> None:
-        """Update current locale depending on self.language."""
+        """Update current locale depending on self.language.
+
+        :return: None
+        """
+
         LANG_TO_LOC[self.language]()
         return
 
+
     def apply_changes(self, **kwargs) -> bool:
-        """Apply changes in options."""
+        """Apply changes in options.
+
+        :return: bool
+        """
+        # restart = False
         restart = True
         if "new_volume" in kwargs:
             self.musicPlayer.setVolume(kwargs["new_volume"] / 100)
@@ -337,7 +414,13 @@ class Game():
 
     @staticmethod
     def resolution_to_tuple(resol: str) -> tuple[int]:
-        """Cast resolution in format 'AxB' to (A, B)."""
+        """Cast resolution in format 'AxB' to (A, B).
+
+        :param resol: resloution type.
+        :type resol: str
+
+        :return: tuple[int]
+        """
         if not isinstance(resol, str):
             raise TypeError("Wrong resol type")
         A, x, B = resol.partition('x')
@@ -349,7 +432,13 @@ class Game():
 
     @staticmethod
     def resolution_to_str(resol: tuple[int, int]) -> str:
-        """Cast resolution in format (A, B) to 'AxB'."""
+        """Cast resolution in format (A, B) to 'AxB'.
+
+        :param resol: resloution type.
+        :type resol: tuple[int, int]
+
+        :return: str
+        """
         if not (isinstance(resol, tuple) or isinstance(resol, list)) or len(resol) == 0\
            or not isinstance(resol[0], int):
             raise TypeError("Wrong resol type")
@@ -357,12 +446,21 @@ class Game():
 
     @staticmethod
     def get_new_resolution(resol_opt: Option_switchable) -> tuple[int]:
-        """Try to change resolution."""
+        """Cast resolution in format (A, B) to 'AxB'.
+
+        :param resol_opt: resloution type.
+        :type resol_opt: Option_switchable
+
+        :return: tuple[int]
+        """
         resol = resol_opt.curr_var
         return Game.resolution_to_tuple(resol)
 
     def options(self) -> None:
-        """Options menu."""
+        """Options menu.
+
+        :return: None
+        """
         pg.display.set_caption("Options")
 
         imageSaver = ImageUploader('images')
@@ -450,7 +548,11 @@ class Game():
         return
 
     def main_menu(self) -> None:
-        """Try Main menu screen."""
+        """Try Main menu screen.
+
+        :return: None
+
+        """
         pg.display.set_caption("Main menu")
 
         imageSaver = ImageUploader('images')
@@ -503,7 +605,7 @@ class Game():
                                 print("NEW THREAD")
                                 self.f_stop = threading.Event()
                                 print("New: ", self.f_stop)
-                                self.updation_of_cur_user_data(self.User, self.coins)
+                                self.updation_of_cur_user_data(self.User)
                         self.play()
                         # killing thread
                         try:
@@ -547,15 +649,22 @@ class Game():
             pg.display.flip()
         return
 
-    def updation_of_cur_user_data(self, username_, coins):
-        """Try to update current logged in user."""
+    def updation_of_cur_user_data(self, username_: str):
+        """Try to update current logged in user.
+
+        :param username_: user's name.
+        :type username_: str
+       
+        :return: None
+
+        """
         if self.User is not None:
             print("Updation")
             insertion_deleting_sqlite.update_signed(None, username_, self.coins)
             try:
                 if not self.f_stop.is_set():
-                    # update each 60 seconds
-                    self.tmp = threading.Timer(5, self.updation_of_cur_user_data, [username_, self.coins])
+                    # update each 5 seconds
+                    self.tmp = threading.Timer(5, self.updation_of_cur_user_data, [username_])
                     self.tmp.start()
             except Exception:
                 sys.exit(0)
@@ -567,18 +676,19 @@ class Game():
 
     def internet_error(self) -> None:
         """Screen for displaying Internet connection error."""
+        gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
         pg.display.set_caption("Main menu")
         imageSaver = ImageUploader('images')
         button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
 
         QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.78 * DISPLAY_HEIGHT),
-                            text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
+                             text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
 
         font_name = "freesansbold.ttf"
         font_size = 30
         MENU_TEXT = pg.font.Font(font_name, font_size).render(_("NO INTERNET! TURN IT ON, THEN RESTART"), True, RED)
         MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
-        gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
         clock = pg.time.Clock()
         running = True
         while running:
@@ -639,4 +749,9 @@ class Game():
             if self.f_stop is not None:
                 self.f_stop.set()
                 self.f_stop = None
+            return
+
+        except IOError:
+
+            self.internet_error()
             return
