@@ -1,6 +1,6 @@
 """Main module."""
 
-import locale
+
 import pygame as pg
 import random
 import time
@@ -11,13 +11,38 @@ from .Option import Option_switchable, Option_slider
 from os import path, listdir
 import threading
 import sys
+import gettext
+
+
+# Costyl variant
+lang_def = gettext.translation("Clicker", path.dirname(__file__), fallback=True)
+lang_ru = gettext.translation("Clicker", path.dirname(__file__), languages=["ru"], fallback=True)
+lang_eng = gettext.translation("Clicker", path.dirname(__file__), languages=["en"], fallback=True)
+
+
+def set_default_language() -> None:
+    """Set language to default."""
+    global lang_def
+    lang_def.install()
+
+
+def set_ru_language() -> None:
+    """Set language to Russian."""
+    global lang_ru
+    lang_ru.install()
+
+
+def set_eng_language() -> None:
+    """Set language to English."""
+    global lang_eng
+    lang_eng.install()
 
 
 """ Play screen:
                         DISPLAY WIDTH
         |-------------------------------------------|
         |   coins         TITLE            home_b   |
-        |                                   opt_b   |
+        |                                           |
         |                                           |
         |                                           |
 DISPLAY |               main_click                  |
@@ -45,13 +70,14 @@ f_stop = None
 LANGUAGES = ["Default", "English", "Russian", ]
 RESOLUTIONS = ["1024x768", "640x480", "1280x720", "1920x1080", ]
 
-LANG_TO_LOC = {"English": "en_US.UTF-8",
-               "Russian": "ru_RU.UTF-8",
-               "Default": "", }
+
+LANG_TO_LOC = {"English": set_eng_language,
+               "Russian": set_ru_language,
+               "Default": set_default_language, }
 
 
 class ImageUploader():
-    """Try Image uploader."""
+    """I Image uploader."""
 
     def __init__(self, dir: str) -> None:
         """Try Init image uploader associated with the <dir> directiry.
@@ -280,10 +306,10 @@ class Game():
         button_home = imageSaver.uploadImage("home_button.png", (0.10 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT))
 
         UPGRADE_BUTTON = Button(button_1, pos=(0.20 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT),
-                                text_input="Upgrade clicker: {}".format(self.costUpgrade), font_size=20,
+                                text_input=_("Upgrade clicker: {}").format(self.costUpgrade), font_size=20,
                                 hovering_color=GREEN)
         AUTOMINER_BUTTON = Button(button_1, pos=(0.80 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT),
-                                  text_input="Upgrade autominer: {}".format(self.costAutominer), font_size=20,
+                                  text_input=_("Upgrade autominer: {}").format(self.costAutominer), font_size=20,
                                   hovering_color=GREEN)
         HOME_BUTTON = Button(button_home, (0.85 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT), "")
 
@@ -310,7 +336,6 @@ class Game():
 
                 # Here we choose the right action depending on the cursor click place
                 elif event.type == pg.MOUSEBUTTONDOWN:
-                    # MOUSE_POS = pg.mouse.get_pos()
                     # if click for score
                     if MOUSE_POS[0] >= DISPLAY_WIDTH * 0.42 and MOUSE_POS[1] >= DISPLAY_HEIGHT * 0.42 and\
                        MOUSE_POS[0] <= DISPLAY_WIDTH * 0.545 and MOUSE_POS[1] <= DISPLAY_HEIGHT * 0.59:
@@ -323,7 +348,7 @@ class Game():
                             self.coins = self.coins - self.costUpgrade
                             self.mong = self.mong * 1.1
                             self.costUpgrade = round(self.costUpgrade * 1.5, 0)
-                            UPGRADE_BUTTON.changeText("Upgrade clicker: {}".format(self.costUpgrade))
+                            UPGRADE_BUTTON.changeText(_("Upgrade clicker: {}").format(self.costUpgrade))
 
                     # if click for autominer
                     elif AUTOMINER_BUTTON.checkForInput(MOUSE_POS):
@@ -331,7 +356,7 @@ class Game():
                             self.coins = self.coins - self.costAutominer
                             self.autog = self.autog + 0.5
                             self.costAutominer = round(self.costAutominer * 1.5, 0)
-                            AUTOMINER_BUTTON.changeText("Upgrade autominer: {}".format(self.costAutominer))
+                            AUTOMINER_BUTTON.changeText(_("Upgrade autominer: {}").format(self.costAutominer))
 
                     # if click for home
                     elif HOME_BUTTON.checkForInput(MOUSE_POS):
@@ -349,25 +374,22 @@ class Game():
 
             Drawer.drawText("ВМИК lif(v)e", BLACK, LIGHT_BLUE,
                             0.5 * DISPLAY_WIDTH, 0.12 * DISPLAY_HEIGHT, 50, screen=self.gameDisplay)
-            Drawer.drawText("You have: " + str(f'{self.coins:.2f}') + " coins", BLACK, LIGHT_BLUE,
+            Drawer.drawText(_("You have {:.2f} coins").format(self.coins), BLACK, LIGHT_BLUE,
                             0.15 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT, 20, screen=self.gameDisplay)
-
-            # Drawer.drawText("Version: " + self.ver, BLACK, LIGHT_BLUE,
-            # 0.85 * DISPLAY_WIDTH, 0.06 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
 
             # updating
             pg.display.flip()
         return
 
     def update_locale(self) -> None:
-        """Try to update locals.
+        """Update current locale depending on self.language.
 
         :return: None
         """
-        new_loc = LANG_TO_LOC[self.language]
-        # print(self.language, new_loc)
-        locale.setlocale(locale.LC_ALL, new_loc)
+
+        LANG_TO_LOC[self.language]()
         return
+
 
     def apply_changes(self, **kwargs) -> bool:
         """Apply changes in options.
@@ -380,17 +402,14 @@ class Game():
             self.musicPlayer.setVolume(kwargs["new_volume"] / 100)
             self.volume = kwargs["new_volume"]
         if "new_language" in kwargs:
-            # restart = True
             self.language = kwargs["new_language"]
             self.update_locale()
         if "new_resolution" in kwargs:
-            # restart = True
             global DISPLAY_HEIGHT, DISPLAY_WIDTH
             self.resolution = self.resolution_to_str(kwargs["new_resolution"])
             DISPLAY_WIDTH = kwargs["new_resolution"][0]
             DISPLAY_HEIGHT = kwargs["new_resolution"][1]
             self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-            print("!!!IN new_resolution")
         return restart
 
     @staticmethod
@@ -402,6 +421,8 @@ class Game():
 
         :return: tuple[int]
         """
+        if not isinstance(resol, str):
+            raise TypeError("Wrong resol type")
         A, x, B = resol.partition('x')
         A = int(A)
         B = int(B)
@@ -418,6 +439,9 @@ class Game():
 
         :return: str
         """
+        if not (isinstance(resol, tuple) or isinstance(resol, list)) or len(resol) == 0\
+           or not isinstance(resol[0], int):
+            raise TypeError("Wrong resol type")
         return str(resol[0]) + "x" + str(resol[1])
 
     @staticmethod
@@ -456,27 +480,27 @@ class Game():
 
         font_name = "freesansbold.ttf"
         font_size = 56
-        OPT_TEXT = pg.font.Font(font_name, font_size).render("Options", True, BLACK)
+        OPT_TEXT = pg.font.Font(font_name, font_size).render(_("Options"), True, BLACK)
         OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT * 0.08))
 
-        LANGUAGE_OPTION = Option_switchable("Language", (0.05 * DISPLAY_WIDTH, 0.30 * DISPLAY_HEIGHT),
+        LANGUAGE_OPTION = Option_switchable(_("Language"), (0.05 * DISPLAY_WIDTH, 0.30 * DISPLAY_HEIGHT),
                                             panel_green, panel_yellow, button_prev, button_next,
                                             variants=LANGUAGES)
         LANGUAGE_OPTION.set_curr_value(self.language)
 
-        RESOLUTION_OPTION = Option_switchable("Resolution", (0.05 * DISPLAY_WIDTH, 0.50 * DISPLAY_HEIGHT),
+        RESOLUTION_OPTION = Option_switchable(_("Resolution"), (0.05 * DISPLAY_WIDTH, 0.50 * DISPLAY_HEIGHT),
                                               panel_green, panel_yellow, button_prev, button_next,
                                               variants=RESOLUTIONS)
         RESOLUTION_OPTION.set_curr_value(self.resolution)
 
-        VOLUME_OPTION = Option_slider(self.gameDisplay, "Volume",
+        VOLUME_OPTION = Option_slider(self.gameDisplay, _("Volume"),
                                       (0.05 * DISPLAY_WIDTH, 0.70 * DISPLAY_HEIGHT), panel_green,
                                       0, 100, 1, slider_colour=DARK_YELLOW, handle_colour=GOLD,
                                       initial_value=self.volume)
 
-        APPLY_BUTTON = Button(button_apply, (0.30 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), "Apply",
+        APPLY_BUTTON = Button(button_apply, (0.30 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), _("Apply"),
                               font_size=46, hovering_color=LIGHT_BLUE)
-        BACK_BUTTON = Button(button_back, (0.70 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), "Esc: back",
+        BACK_BUTTON = Button(button_back, (0.70 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), _("Esc: back"),
                              font_size=46, hovering_color=BLUE_GRAY)
 
         clock = pg.time.Clock()
@@ -540,17 +564,17 @@ class Game():
 
         font_name = "freesansbold.ttf"
         font_size = 80
-        MENU_TEXT = pg.font.Font(font_name, font_size).render("Clicker: MSU edition", True, BLACK)
+        MENU_TEXT = pg.font.Font(font_name, font_size).render(_("Clicker: MSU edition"), True, BLACK)
         MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.12 * DISPLAY_HEIGHT))
 
         PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT),
-                             text_input="PLAY", font_size=48)
+                             text_input=_("PLAY"), font_size=48)
         OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.48 * DISPLAY_HEIGHT),
-                                text_input="OPTIONS", font_size=48)
+                                text_input=_("OPTIONS"), font_size=48)
         RATING_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.63 * DISPLAY_HEIGHT),
-                               text_input="SAVE & RATING", font_size=36)
+                             text_input=_("SAVE & RATING"), font_size=28)
         QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.78 * DISPLAY_HEIGHT),
-                             text_input="QUIT", font_size=48, hovering_color=BLACK)
+                             text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
 
         clock = pg.time.Clock()
         while self.running and not self._reset_screen:
@@ -561,7 +585,7 @@ class Game():
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
 
             if self.User is not None:
-                USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
+                USER_TEXT = pg.font.Font(font_name, 40).render(_("СURRENT USER: {}").format(self.User), True, WHITE)
                 USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
                 self.gameDisplay.blit(USER_TEXT, USER_RECT)
 
@@ -650,6 +674,44 @@ class Game():
                 self.f_stop.set()
                 self.f_stop = None
 
+    def internet_error(self) -> None:
+        """Screen for displaying Internet connection error."""
+        pg.display.set_caption("Main menu")
+        imageSaver = ImageUploader('images')
+        button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
+
+        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.78 * DISPLAY_HEIGHT),
+                            text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
+
+        font_name = "freesansbold.ttf"
+        font_size = 30
+        MENU_TEXT = pg.font.Font(font_name, font_size).render(_("NO INTERNET! TURN IT ON, THEN RESTART"), True, RED)
+        MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
+        gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        clock = pg.time.Clock()
+        running = True
+        while running:
+            clock.tick(FPS)
+            gameDisplay.blit(MENU_TEXT, MENU_RECT)
+            MOUSE_POS = pg.mouse.get_pos()
+
+            for button in [QUIT_BUTTON]:
+                button.changeColor(MOUSE_POS, gameDisplay)
+                button.update(gameDisplay)
+
+            for event in pg.event.get():
+
+                if event.type == pg.QUIT:
+                    running = False
+                    continue
+
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if QUIT_BUTTON.checkForInput(MOUSE_POS):
+                        running = False
+                        continue
+
+            pg.display.flip()
+
     def __init__(self) -> None:
         """Start the game."""
         # Setting display
@@ -684,40 +746,6 @@ class Game():
             return
 
         except IOError:
-            "Google is not available! Internet is broken!"
-            pg.display.set_caption("Main menu")
-            gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-            imageSaver = ImageUploader('images')
-            button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
 
-            QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.78 * DISPLAY_HEIGHT),
-                                 text_input="QUIT", font_size=48, hovering_color=BLACK)
-
-            font_name = "freesansbold.ttf"
-            font_size = 30
-            MENU_TEXT = pg.font.Font(font_name, font_size).render("NO INTERNET! TURN IT ON, THEN RESTART", True, RED)
-            MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
-            clock = pg.time.Clock()
-            running = True
-            while running:
-                clock.tick(60)
-                gameDisplay.blit(MENU_TEXT, MENU_RECT)
-                MOUSE_POS = pg.mouse.get_pos()
-
-                for button in [QUIT_BUTTON]:
-                    button.changeColor(MOUSE_POS, gameDisplay)
-                    button.update(gameDisplay)
-
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        running = False
-                        continue
-
-                    if event.type == pg.MOUSEBUTTONDOWN:
-                        if QUIT_BUTTON.checkForInput(MOUSE_POS):
-                            running = False
-                            continue
-
-                pg.display.flip()
-
+            self.internet_error()
             return

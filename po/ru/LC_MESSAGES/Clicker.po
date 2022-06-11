@@ -1,0 +1,192 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-06-11 12:30+0300\n"
+"PO-Revision-Date: 2022-06-11 00:24+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.1\n"
+
+#: ClickerMSU/__init__.py:245 ClickerMSU/__init__.py:287
+msgid "Upgrade clicker: {}"
+msgstr "Улучшить кликер: {}"
+
+#: ClickerMSU/__init__.py:248 ClickerMSU/__init__.py:295
+msgid "Upgrade autominer: {}"
+msgstr "Улучшить автофарм: {}"
+
+#: ClickerMSU/__init__.py:313
+msgid "You have {:.2f} coins"
+msgstr "Монет: {:.2f}"
+
+#: ClickerMSU/__init__.py:386
+msgid "Options"
+msgstr "Опции"
+
+#: ClickerMSU/__init__.py:389
+msgid "Language"
+msgstr "Язык"
+
+#: ClickerMSU/__init__.py:394
+msgid "Resolution"
+msgstr "Разрешение"
+
+#: ClickerMSU/__init__.py:399
+msgid "Volume"
+msgstr "Громкость"
+
+#: ClickerMSU/__init__.py:404
+msgid "Apply"
+msgstr "Применить"
+
+#: ClickerMSU/__init__.py:406
+msgid "Esc: back"
+msgstr "Esc: назад"
+
+#: ClickerMSU/__init__.py:466
+msgid "Clicker: MSU edition"
+msgstr "Кликер: МГУ эдишн"
+
+#: ClickerMSU/__init__.py:470
+msgid "PLAY"
+msgstr "Играть"
+
+#: ClickerMSU/__init__.py:472
+msgid "OPTIONS"
+msgstr "Опции"
+
+#: ClickerMSU/__init__.py:474
+msgid "SAVE & RATING"
+msgstr "Сохранить/рейтинг"
+
+#: ClickerMSU/__init__.py:476 ClickerMSU/__init__.py:576
+msgid "QUIT"
+msgstr "Выход"
+
+#: ClickerMSU/__init__.py:487
+msgid "СURRENT USER: {}"
+msgstr "Текущий пользователь: {}"
+
+#: ClickerMSU/__init__.py:580
+msgid "NO INTERNET! TURN IT ON, THEN RESTART"
+msgstr "Проблемы с Интернетом!\n Исправьте и перезапустите"
+
+#: ClickerMSU/input.py:99
+msgid "Registration"
+msgstr "Регистрация"
+
+#: ClickerMSU/input.py:100
+msgid "REGISTRATE TO START"
+msgstr "Зарегистрироваться чтобы начать"
+
+#: ClickerMSU/input.py:100
+msgid "WITH CURRENT PLACE"
+msgstr "с текущим местом"
+
+#: ClickerMSU/input.py:100
+msgid "NEXT TIME"
+msgstr "в следующий раз"
+
+#: ClickerMSU/input.py:102
+msgid "SIGN IN TO SAVE &"
+msgstr "Сохранить"
+
+#: ClickerMSU/input.py:102
+msgid "CONTINUE PLAYING"
+msgstr "Продолжить игру"
+
+#: ClickerMSU/input.py:103
+msgid "   Sign in   "
+msgstr "   Войти   "
+
+#: ClickerMSU/input.py:105 ClickerMSU/input.py:220 ClickerMSU/input.py:322
+msgid "BACK"
+msgstr "Назад"
+
+#: ClickerMSU/input.py:173
+msgid "Username is empty"
+msgstr "Пустое имя пользователя"
+
+#: ClickerMSU/input.py:176
+#, fuzzy
+msgid "Password is empty"
+msgstr "Пароль ещё раз: "
+
+#: ClickerMSU/input.py:179
+msgid "User with same already exists..."
+msgstr "Имя занято"
+
+#: ClickerMSU/input.py:182
+msgid "Passwords don't match..."
+msgstr "Пароли не совпадают..."
+
+#: ClickerMSU/input.py:207 ClickerMSU/input.py:312
+msgid "Username: "
+msgstr "Пользователь: "
+
+#: ClickerMSU/input.py:210 ClickerMSU/input.py:315
+msgid "Password: "
+msgstr "Пароль: "
+
+#: ClickerMSU/input.py:213
+msgid "Password again: "
+msgstr "Пароль ещё раз: "
+
+#: ClickerMSU/input.py:218
+msgid "Register"
+msgstr "Зарегистрироваться"
+
+#: ClickerMSU/input.py:255 ClickerMSU/input.py:282
+msgid "You are not registrated yet"
+msgstr "Вы еще не зарегистрированы"
+
+#: ClickerMSU/input.py:258 ClickerMSU/input.py:285
+msgid "You didn't input password"
+msgstr "Вы не ввели пароль"
+
+#: ClickerMSU/input.py:261 ClickerMSU/input.py:288
+msgid "Wrong password"
+msgstr "Неправильный пароль"
+
+#: ClickerMSU/input.py:264 ClickerMSU/input.py:291
+msgid "You didn't specify username"
+msgstr "Вы не указали время пользователя"
+
+#: ClickerMSU/input.py:320
+msgid "SIGN IN"
+msgstr "Войти"
+
+#: ClickerMSU/input.py:361
+msgid "Top 10 players: "
+msgstr "Топ 10 игроков: "
+
+#: ClickerMSU/input.py:361
+msgid "Your place: "
+msgstr "Ваше место: "
+
+#: ClickerMSU/input.py:362
+msgid "Your score: "
+msgstr "Ваш результат: "
+
+#: ClickerMSU/input.py:371
+msgid "DONE"
+msgstr "Готово"
+
+#~ msgid "TestHello"
+#~ msgstr "ТестовыйПривет"
+
+#~ msgid "TEST"
+#~ msgstr "ТЕСТ"
+
