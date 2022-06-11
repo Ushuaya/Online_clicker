@@ -533,7 +533,7 @@ class Game():
             insertion_deleting_sqlite.update_signed(None, username_, self.coins)
             try:
                 if not self.f_stop.is_set():
-                    # update each 60 seconds
+                    # update each 5 seconds
                     self.tmp = threading.Timer(5, self.updation_of_cur_user_data, [username_, self.coins])
                     self.tmp.start()
             except Exception:
@@ -580,6 +580,7 @@ class Game():
         except IOError:
             "Google is not available! Internet is broken!"
             pg.display.set_caption("Main menu")
+            gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
             imageSaver = ImageUploader('images')
             button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
 
@@ -590,7 +591,6 @@ class Game():
             font_size = 30
             MENU_TEXT = pg.font.Font(font_name, font_size).render("NO INTERNET! TURN IT ON, THEN RESTART", True, RED)
             MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
-            gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
             clock = pg.time.Clock()
             running = True
             while running:
