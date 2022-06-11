@@ -240,7 +240,7 @@ def update_signed(messg, username_in: str = None, coins: int = None) -> None:
     :type username_in: str
     :param password_in:  user password
     :type password_in: str
-    :param coins:  user coins
+    :param coins: user coins
     :type coins: int
     
     :return: None
@@ -251,6 +251,7 @@ def update_signed(messg, username_in: str = None, coins: int = None) -> None:
         cursor = connect.cursor()
         try:
             cursor.execute("DROP TABLE login_id;")
+            cursor.execute("DELETE FROM login_id WHERE username = (?)", (username_in,))
         except Exception:
             pass
         cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);")
@@ -327,7 +328,7 @@ def sighin(messg, username_in: str = None, password_in: str = None, coins: int =
             # Вы успешно вошли
             cursor.execute("SELECT id FROM login_id WHERE username = (?)", (username_in,))
             score = cursor.fetchone()
-            score_out = max(score[0], coins)
+            score_out = max(score[0], 0)
             print(score_out)
 
             # updating

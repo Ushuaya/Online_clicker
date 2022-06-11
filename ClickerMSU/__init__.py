@@ -369,7 +369,7 @@ class Game():
                 button.changeColor(MOUSE_POS)
                 button.update(self.gameDisplay)
 
-            Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, button_1, butn_bckrnd)
+            Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, butn_bckrnd)
             self.gameDisplay.blit(currLogo, (DISPLAY_WIDTH * 0.42, DISPLAY_HEIGHT * 0.42))
 
             Drawer.drawText("ВМИК lif(v)e", BLACK, LIGHT_BLUE,
@@ -605,7 +605,7 @@ class Game():
                                 print("NEW THREAD")
                                 self.f_stop = threading.Event()
                                 print("New: ", self.f_stop)
-                                self.updation_of_cur_user_data(self.User, self.coins)
+                                self.updation_of_cur_user_data(self.User)
                         self.play()
                         # killing thread
                         try:
@@ -664,7 +664,7 @@ class Game():
             try:
                 if not self.f_stop.is_set():
                     # update each 5 seconds
-                    self.tmp = threading.Timer(5, self.updation_of_cur_user_data, [username_, self.coins])
+                    self.tmp = threading.Timer(5, self.updation_of_cur_user_data, [username_])
                     self.tmp.start()
             except Exception:
                 sys.exit(0)
@@ -676,18 +676,19 @@ class Game():
 
     def internet_error(self) -> None:
         """Screen for displaying Internet connection error."""
+        gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
         pg.display.set_caption("Main menu")
         imageSaver = ImageUploader('images')
         button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
 
         QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.78 * DISPLAY_HEIGHT),
-                            text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
+                             text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
 
         font_name = "freesansbold.ttf"
         font_size = 30
         MENU_TEXT = pg.font.Font(font_name, font_size).render(_("NO INTERNET! TURN IT ON, THEN RESTART"), True, RED)
         MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT // 2))
-        gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
         clock = pg.time.Clock()
         running = True
         while running:
