@@ -21,7 +21,25 @@ class InputBox:
     """Class to create input boxes."""
 
     def __init__(self, x: int, y: int, w: int, h: int, text: str = '') -> None:
-        """Initialize set ups."""
+        """Initialize set ups.
+
+        :param x:  x pos
+        :type x: int
+
+        :param y:  y pos
+        :type y: int
+
+        :param w:  width
+        :type w: int
+
+        :param h:  height
+        :type h: int
+
+        :param text:  user's text
+        :type text: str
+        
+        :return: None
+        """
         self.rect = pg.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
@@ -31,7 +49,13 @@ class InputBox:
         self.password = False
 
     def handle_event(self, event: pg.event) -> None:
-        """Toggle action of input box."""
+        """Toggle action of input box.
+        
+        :param event:  any event in game
+        :type event: pg.event
+        
+        :return: None
+        """
         if event.type == pg.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.
             if self.rect.collidepoint(event.pos):
@@ -51,20 +75,35 @@ class InputBox:
                 self.txt_surface = FONT.render("*" * len(self.text) if self.password is True
                                                else self.text, True, self.color)
 
-    def update(self):
-        """Update input box."""
+    def update(self) -> None:
+        """Update input box.
+
+        :return: None
+        """
         # Resize the box if the text is too long.
         width = max(200, self.txt_surface.get_width() + 10)
         self.rect.w = width
 
     def draw(self, screen: pg.Surface) -> None:
-        """Draw input box."""
+        """Draw input box.
+        
+        :return: None
+        """
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
         pg.draw.rect(screen, self.color, self.rect, 2)
 
 
 def main_c(coins=None, d_w: int = 1024, d_h: int = 768) -> list:
-    """Try main cycle of registration module."""
+    """Try main cycle of registration module.
+
+    :param d_w:  width
+    :type d_w: int
+
+    :param d_h:  height
+    :type d_h: int
+    
+    :return: list
+    """
     imageSaver = ImageUploader('images')
     global DISPLAY_WIDTH
     global DISPLAY_HEIGHT

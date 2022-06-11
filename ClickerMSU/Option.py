@@ -23,10 +23,16 @@ class Option:
     def __init__(self, option_name: str, pos: tuple[int], name_pic: pg.Surface):
         """Create an object.
 
-        params:
-            option_name - str, name of the option
-            pos - tuple[int], position for start of option (bottomleft of name_pic)
-            name_pic - pg.Surface, picture for pannel with option_name
+        :param option_name: name of the option
+        :type option_name: str
+
+        :param pos: position for start of option (bottomleft of name_pic)
+        :type pos: tuple[int]
+
+        :param name_pic: picture for pannel with option_name
+        :type name_pic: pg.Surface
+        
+        :return: None
         """
         self.x_pos = pos[0]
         self.y_pos = pos[1]
@@ -39,9 +45,13 @@ class Option:
     def change_font(self, font_name: str = None, font_size: int = None) -> None:
         """Change font and/or font_size for option's text.
 
-        params:
-            font_name - str, name of new font, if None - remains the same
-            font_size - int, new size, if None - remains the same
+        :param font_name: name of new font, if None - remains the same
+        :type font_name: str
+
+        :param font_size: new size, if None - remains the same
+        :type font_size: int
+        
+        :return: None
         """
         if font_name:
             self.font_name = font_name
@@ -61,14 +71,28 @@ class Option_switchable(Option):
                  switch_next_pic: pg.Surface, variants: tuple[str] = None):
         """Create an object.
 
-        params:
-            option_name - str, name of the option
-            pos - tuple[int], position for start of option (bottomleft of name_pic)
-            name_pic - pg.Surface, picture for pannel with option_name
-            current_var_pic - pg.Surface, picture for pannel with current (selected) variant
-            switch_prev_pic - pg.Surface, picture for button for switching to previous variant
-            switch_prev_pic - pg.Surface, picture for button for switching to next variant
-            variants - tuple[str], possible values
+        :param option_name: name of the option
+        :type option_name: str
+
+        :param pos: position for start of option (bottomleft of name_pic)
+        :type pos: tuple[int]
+
+        :param name_pic: picture for pannel with option_name
+        :type name_pic: pg.Surface
+
+        :param current_var_pic: picture for pannel with current (selected) variant
+        :type current_var_pic: pg.Surface
+
+        :param switch_prev_pic: picture for button for switching to previous variant
+        :type switch_prev_pic: pg.Surface
+
+        :param switch_next_pic: picture for button for switching to next variant
+        :type switch_next_pic: pg.Surface
+
+        :param variants: possible values
+        :type variants: tuple[str]
+
+        :return: None
         """
         super().__init__(option_name, pos, name_pic)
         self.switch_prev_pic = switch_prev_pic
@@ -82,7 +106,10 @@ class Option_switchable(Option):
         self._make_gui()
 
     def _make_gui(self) -> None:
-        """Make gui for options."""
+        """Make gui for options.
+
+        :return: None
+        """
         self.rect_name_pic = self.name_pic.get_rect(bottomleft=(self.x_pos, self.y_pos))
         self.rect_opt_name_text = self.opt_name_text.get_rect(center=self.rect_name_pic.center)
 
@@ -107,7 +134,13 @@ class Option_switchable(Option):
         return
 
     def update(self, screen: pg.Surface) -> None:
-        """Update options images on screen."""
+        """Update options images on screen.
+        
+        :param screen: screen where to show
+        :type screen: pg.Surface
+
+        :return: None
+        """
         screen.blit(self.name_pic, self.rect_name_pic)
         screen.blit(self.opt_name_text, self.rect_opt_name_text)
 
@@ -118,21 +151,39 @@ class Option_switchable(Option):
         screen.blit(self.curr_var_text, self.rect_curr_var_text)
 
     def check_for_switch_prev(self, position: tuple[int]) -> bool:
-        """Check if possition corresponds to switch prev button."""
+        """Check if possition corresponds to switch prev button.
+        
+        :param position: sposition of options' click
+        :type position: tuple[int]
+
+        :return: bool
+        """
         return self.switch_prev_button.checkForInput(position)
 
     def check_for_switch_next(self, position: tuple[int]) -> bool:
-        """Check if possition corresponds to switch next button."""
+        """Check if possition corresponds to switch next button.
+        
+        :param position: sposition of options' click
+        :type position: tuple[int]
+
+        :return: bool
+        """
         return self.switch_next_button.checkForInput(position)
 
     def switch_next(self) -> None:
-        """Switch current variant to next."""
+        """Switch current variant to next.
+
+        :return: bool
+        """
         self.variants.rotate(-1)
         self.curr_var = self.variants[0]
         self.curr_var_text = self.font.render(self.curr_var, True, WHITE)
 
     def switch_prev(self) -> None:
-        """Switch current variant to previous."""
+        """Switch current variant to previous.
+        
+        :return: bool
+        """
         self.variants.rotate(1)
         self.curr_var = self.variants[0]
         self.curr_var_text = self.font.render(self.curr_var, True, WHITE)
@@ -140,10 +191,10 @@ class Option_switchable(Option):
     def switch_mb(self, position: tuple[int]) -> bool:
         """Check if position corresponds to switch buttons and if it is then switch.
 
-        params:
-            position - tuple[int], position to check
-        returns:
-            True if switched, False otherwise
+        :param position: sposition of options' click to check
+        :type position: tuple[int]
+
+        :return: bool
         """
         if self.check_for_switch_prev(position):
             self.switch_prev()
@@ -154,7 +205,13 @@ class Option_switchable(Option):
         return False
 
     def set_curr_value(self, value: str) -> None:
-        """Set current value for option."""
+        """Set current value for option.
+        
+        :param value: value ti set
+        :type value: str
+
+        :return: bool
+        """
         if value not in self.variants:
             raise ValueError(f"Wrong value for option: {self.opt_name}")
         while value != self.variants[0]:
@@ -176,21 +233,50 @@ class Option_slider(Option):
                  left: int = 0, right: int = 100, step: int = 1, **kwargs):
         """Create an object.
 
-        params:
-            display - pg.Surface, Surface to draw on
-            option_name - str, name of the option
-            pos - tuple[int], position for start of option (bottomleft of name_pic)
-            name_pic - pg.Surface, picture for pannel with option_name
-            left - int, slider's left bound
-            right - int, slider's right bound
-            step - int, slider's step
+        :param display: Surface to draw on
+        :type display: pg.Surface
+
+        :param option_name: name of the option
+        :type valoption_nameue: str
+
+        :param pos: position for start of option (bottomleft of name_pic)
+        :type pos: tuple[int]
+
+        :param name_pic: picture for pannel with option_name
+        :type name_pic: pg.Surface
+
+        :param left: slider's left bound
+        :type left: int
+
+        :param right: slider's right bound
+        :type right: int
+
+        :param step: slider's step
+        :type step: int
+
+        :return: None
         """
         super().__init__(option_name, pos, name_pic)
         self._make_gui(display, left, right, step, **kwargs)
 
     def _create_slider(self, display: pg.Surface, left: int = 0, right: int = 100,
                        step: int = 1, **kwargs) -> Slider:
-        """Create slider."""
+        """Create slider.
+        
+        :param display: Surface to draw on
+        :type display: pg.Surface
+
+        :param left: slider's left bound
+        :type left: int
+
+        :param right: slider's right bound
+        :type right: int
+
+        :param step: slider's step
+        :type step: int
+
+        :return: Slider
+        """
         # Space between opt name panel and slider
         shift1 = self.rect_name_pic.width * self._COEF_SPACE_AFTER_NAME
 
@@ -211,7 +297,13 @@ class Option_slider(Option):
         return self.slider
 
     def _create_output(self, display: pg.Surface, **kwargs) -> TextBox:
-        """Create output for slider."""
+        """Create output for slider.
+        
+        :param display: Surface to draw on
+        :type display: pg.Surface
+
+        :return: TextBox
+        """
         # Set output (square under the center of slider)
         output_size = self.rect_name_pic.height * self._COEF_OUTPUT_SIZE
         output_pos = (self.slider.getX() + self.slider.getWidth()
@@ -224,7 +316,22 @@ class Option_slider(Option):
 
     def _make_gui(self, display: pg.Surface, left: int = 0, right: int = 100,
                   step: int = 1, **kwargs) -> None:
-        """Make gui for options."""
+        """Make gui for options.
+        
+        :param display: Surface to draw on
+        :type display: pg.Surface
+
+        :param left: slider's left bound
+        :type left: int
+
+        :param right: slider's right bound
+        :type right: int
+
+        :param step: slider's step
+        :type step: int
+
+        :return: None
+        """
         self.rect_name_pic = self.name_pic.get_rect(bottomleft=(self.x_pos, self.y_pos))
         self.rect_opt_name_text = self.opt_name_text.get_rect(center=self.rect_name_pic.center)
 
@@ -233,23 +340,44 @@ class Option_slider(Option):
         return
 
     def update(self, screen: pg.Surface) -> None:
-        """Update options images on screen."""
+        """Update options images on screen.
+        
+        :param screen: screen to draw on
+        :type screen: pg.Surface
+
+        :return: None
+        """
         screen.blit(self.name_pic, self.rect_name_pic)
         screen.blit(self.opt_name_text, self.rect_opt_name_text)
         self.output.draw()
         self.slider.draw()
 
     def get_value(self) -> int:
-        """Get slider's value."""
+        """Get slider's value.
+        
+        :return: int
+        """
         return self.slider.getValue()
 
     def set_value(self, val: int) -> None:
-        """Set value for slider."""
+        """Set value for slider.
+        
+        :param val: value of the slider to set
+        :type val: int
+
+        :return: None
+        """
         self.slider.value = val
         return
 
     def update_slider(self, events: list[pg.event.Event]) -> None:
-        """Update slider."""
+        """Update slider.
+        
+        :param events: events in option (any)
+        :type events: list[pg.event.Event]
+
+        :return: None
+        """
         self.output.setText(self.slider.getValue())
         pygame_widgets.update(events)
         return
