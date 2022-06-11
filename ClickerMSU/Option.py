@@ -214,8 +214,8 @@ class Option_slider(Option):
         """Create output for slider."""
         # Set output (square under the center of slider)
         output_size = self.rect_name_pic.height * self._COEF_OUTPUT_SIZE
-        output_pos = (self.slider.getX() + self.slider.getWidth() +
-                      self.rect_name_pic.width * self._COEF_SPACE_SLIDER_OUTPUT,
+        output_pos = (self.slider.getX() + self.slider.getWidth()
+                      + self.rect_name_pic.width * self._COEF_SPACE_SLIDER_OUTPUT,
                       self.rect_name_pic.centery - output_size // 2)
         self.output = TextBox(display, output_pos[0], output_pos[1],
                               output_size, output_size, fontSize=self.font_size, **kwargs)

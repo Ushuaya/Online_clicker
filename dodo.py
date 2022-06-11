@@ -5,6 +5,7 @@ from doit.tools import create_folder
 
 DOIT_CONFIG = {'default_tasks': ['all']}
 
+
 def task_pot():
     """Re-create .pot ."""
     return {
