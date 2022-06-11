@@ -15,8 +15,6 @@ pg.init()
 FONT = pg.font.Font(None, 32)
 
 
-
-
 class InputBox:
 
     def __init__(self, x, y, w, h, text=''):
@@ -131,11 +129,13 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                 screen.blit(bckgrnd_im, (0, 0))
                 MOUSE_POS = pg.mouse.get_pos()
                 REGISTRATION_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.2, DISPLAY_WIDTH * 0.1), 
-                                text_input="Registration", font_size=48, hovering_color=(0,0,0), tipper=["REGISTRATE TO START", "WITH CURRENT PLACE", "NEXT TIME"])
-                SIGN_IN_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.6, DISPLAY_WIDTH * 0.1), tipper=["SIGN IN TO SAVE &", "CONTINUE PLAYING"], 
-                                text_input="   Sign in   ", font_size=48, hovering_color=(0,0,0))
+                                text_input=_("Registration"), font_size=36, hovering_color=(0,0,0), 
+                                tipper=[_("REGISTRATE TO START"), _("WITH CURRENT PLACE"), _("NEXT TIME")])
+                SIGN_IN_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.6, DISPLAY_WIDTH * 0.1), 
+                                tipper=[_("SIGN IN TO SAVE &"), _("CONTINUE PLAYING")], 
+                                text_input=_("   Sign in   "), font_size=48, hovering_color=(0,0,0))
                 BACK_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.8), 
-                                text_input="BACK", font_size=48)
+                                     text_input=_("BACK"), font_size=48)
 
                 
                 #self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
@@ -172,16 +172,16 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                             match table_10: 
                                 case 1: 
                                     wrong_inp = True
-                                    Error_msg = "Username is empty"
+                                    Error_msg = _("Username is empty")
                                 case 2: 
                                     wrong_inp = True
-                                    Error_msg = "Password is empty"
+                                    Error_msg = _("Password is empty")
                                 case 3: 
                                     wrong_inp = True
-                                    Error_msg = "User with same already exists..."
+                                    Error_msg = _("User with same already exists...")
                                 case 4: 
                                     wrong_inp = True
-                                    Error_msg = "Passwords don't match..."
+                                    Error_msg = _("Passwords don't match...")
                                 case _: 
                                     wrong_inp = False
                                     Error_msg = ""
@@ -207,22 +207,22 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                 for box in input_boxes_registration:
                     box.draw(screen)
 
-                Drawer2.drawText("Username: " , (0, 0, 0), None, 
+                Drawer2.drawText(_("Username: ") , (0, 0, 0), None, 
                                     DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.3, 20, screen = screen)
                 
-                Drawer2.drawText("Password: " , (0, 0, 0), None, 
+                Drawer2.drawText(_("Password: ") , (0, 0, 0), None, 
                                     DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.37, 20, screen = screen)
                 
-                Drawer2.drawText("Password again: " , (0, 0, 0), None, 
+                Drawer2.drawText(_("Password again: ") , (0, 0, 0), None, 
                                     DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.44, 20, screen = screen)
 
 
 
                 MOUSE_POS = pg.mouse.get_pos()
                 REGISTRATION_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87), 
-                                text_input="Register", font_size=48, hovering_color=(0,0,0))
+                                             text_input=_("Register"), font_size=26, hovering_color=(0,0,0))
                 BACK_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87), 
-                                text_input="BACK", font_size=48)
+                                     text_input=_("BACK"), font_size=48)
 
                 for button in [REGISTRATION_BUTTON, BACK_BUTTON]:
                     button.changeColor(MOUSE_POS)
@@ -258,16 +258,16 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                             match table_10: 
                                 case 1: 
                                     wrong_inp = True
-                                    Error_msg = "You are not registrated yet"
+                                    Error_msg = _("You are not registrated yet")
                                 case 2: 
                                     wrong_inp = True
-                                    Error_msg = "You didn't input password"
+                                    Error_msg = _("You didn't input password")
                                 case 3: 
                                     wrong_inp = True
-                                    Error_msg = "Wrong password"
+                                    Error_msg = _("Wrong password")
                                 case 4: 
                                     wrong_inp = True
-                                    Error_msg = "You didn't specify username"
+                                    Error_msg = _("You didn't specify username")
                                 case _: 
                                     wrong_inp = False
                                     Error_msg = ""
@@ -284,16 +284,16 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                         match table_10: 
                             case 1: 
                                 wrong_inp = True
-                                Error_msg = "You are not registrated yet"
+                                Error_msg = _("You are not registrated yet")
                             case 2: 
                                 wrong_inp = True
-                                Error_msg = "You didn't input password"
+                                Error_msg = _("You didn't input password")
                             case 3: 
                                 wrong_inp = True
-                                Error_msg = "Wrong password"
+                                Error_msg = _("Wrong password")
                             case 4: 
                                 wrong_inp = True
-                                Error_msg = "You didn't specify username"
+                                Error_msg = _("You didn't specify username")
                             case _: 
                                 wrong_inp = False
                                 Error_msg = ""
@@ -318,18 +318,18 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                 for box in input_boxes:
                     box.draw(screen)
 
-                Drawer2.drawText("Username: " , (0, 0, 0), None, 
+                Drawer2.drawText(_("Username: ") , (0, 0, 0), None, 
                                     DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.3, 22, screen = screen)
                 
-                Drawer2.drawText("Password: " , (0, 0, 0), None, 
+                Drawer2.drawText(_("Password: ") , (0, 0, 0), None, 
                                     DISPLAY_WIDTH * 0.2, DISPLAY_HEIGHT * 0.37, 22, screen = screen)
 
                 
                 MOUSE_POS = pg.mouse.get_pos()
                 SIGN_IN_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87), 
-                                text_input="SIGN IN", font_size=48, hovering_color=(0,0,0))
+                                text_input=_("SIGN IN"), font_size=48, hovering_color=(0,0,0))
                 BACK_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.35, DISPLAY_HEIGHT * 0.87), 
-                                text_input="BACK", font_size=48)
+                                text_input=_("BACK"), font_size=48)
 
                 for button in [SIGN_IN_BUTTON, BACK_BUTTON]:
                     button.changeColor(MOUSE_POS)
@@ -369,7 +369,8 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
                 table_10_2 = [("")]
                 for i in range(len(table_10)): 
                     table_10_2 += [(str(i+1) + ". " + str(table_10[i][1]) + " -- " + str(table_10[i][0]))]
-                list_to_print = [("Top 10 players: ")] + table_10_2 + [("")] + [("Your place: ")] + [(pos[0][2])] +  [("Your score: ")] + [(pos[0][0])]
+                list_to_print = [(_("Top 10 players: "))] + table_10_2 + [("")] + [(_("Your place: "))] + [(pos[0][2])] +\
+                                [(_("Your score: "))] + [(pos[0][0])]
                 enter = 0 
                 for i in list_to_print: 
                     Drawer2.drawText(str(i)  , (50, 100, 11), None, 
@@ -379,7 +380,7 @@ def main_c(coins = None, d_w = 1024, d_h = 768):
 
                 MOUSE_POS = pg.mouse.get_pos()
                 DONE_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH * 0.75, DISPLAY_HEIGHT * 0.87), 
-                                text_input="DONE", font_size=48, hovering_color=(0,0,0))
+                                text_input=_("DONE"), font_size=48, hovering_color=(0,0,0))
                 
 
                 for button in [DONE_BUTTON]:

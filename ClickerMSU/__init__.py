@@ -242,10 +242,10 @@ class Game():
         button_home = imageSaver.uploadImage("home_button.png", (0.10 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT))
 
         UPGRADE_BUTTON = Button(button_1, pos=(0.20 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
-                                text_input="Upgrade clicker: {}".format(self.costUpgrade), font_size=20, 
+                                text_input=_("Upgrade clicker: {}").format(self.costUpgrade), font_size=20, 
                                 hovering_color=GREEN)
         AUTOMINER_BUTTON = Button(button_1, pos=(0.80 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
-                                  text_input="Upgrade autominer: {}".format(self.costAutominer), font_size=20, 
+                                  text_input=_("Upgrade autominer: {}").format(self.costAutominer), font_size=20, 
                                   hovering_color=GREEN)
         HOME_BUTTON = Button(button_home, (0.85 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT), "")
         
@@ -284,7 +284,7 @@ class Game():
                             self.coins = self.coins - self.costUpgrade
                             self.mong = self.mong * 1.1
                             self.costUpgrade = round(self.costUpgrade * 1.5, 0)
-                            UPGRADE_BUTTON.changeText("Upgrade clicker: {}".format(self.costUpgrade))
+                            UPGRADE_BUTTON.changeText(_("Upgrade clicker: {}").format(self.costUpgrade))
 
                     # if click for autominer
                     elif AUTOMINER_BUTTON.checkForInput(MOUSE_POS):
@@ -292,7 +292,7 @@ class Game():
                             self.coins = self.coins - self.costAutominer
                             self.autog = self.autog + 0.5
                             self.costAutominer = round(self.costAutominer * 1.5, 0)
-                            AUTOMINER_BUTTON.changeText("Upgrade autominer: {}".format(self.costAutominer))
+                            AUTOMINER_BUTTON.changeText(_("Upgrade autominer: {}").format(self.costAutominer))
                     
                     # if click for home
                     elif HOME_BUTTON.checkForInput(MOUSE_POS):
@@ -310,7 +310,7 @@ class Game():
 
             Drawer.drawText("ВМИК lif(v)e", BLACK, LIGHT_BLUE, 
                             0.5 * DISPLAY_WIDTH, 0.12 * DISPLAY_HEIGHT, 50, screen = self.gameDisplay)
-            Drawer.drawText("You have: " + str(f'{self.coins:.2f}') + " coins", BLACK, LIGHT_BLUE, 
+            Drawer.drawText(_("You have {:.2f} coins").format(self.coins), BLACK, LIGHT_BLUE, 
                             0.15 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
 
             #updating 
@@ -461,7 +461,7 @@ class Game():
 
         font_name = "freesansbold.ttf" 
         font_size = 80
-        MENU_TEXT = pg.font.Font(font_name, font_size).render("Clicker: MSU edition", True, BLACK)
+        MENU_TEXT = pg.font.Font(font_name, font_size).render(_("Clicker: MSU edition"), True, BLACK)
         MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.12 * DISPLAY_HEIGHT))
         
         PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT), 
@@ -482,7 +482,7 @@ class Game():
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
 
             if self.User != None: 
-                USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
+                USER_TEXT = pg.font.Font(font_name, 40).render(_("СURRENT USER: {}").format(self.User), True, WHITE)
                 USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
                 self.gameDisplay.blit(USER_TEXT, USER_RECT)
 
@@ -495,7 +495,6 @@ class Game():
                     self.running = False
                     continue
                 elif event.type == pg.MOUSEBUTTONDOWN:
-                    print(locale.getlocale())
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                         # starting updatign of coins with server
                         if self.User != None: 
@@ -572,7 +571,7 @@ class Game():
         button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
 
         QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
-                            text_input="QUIT", font_size=48, hovering_color=BLACK)
+                            text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
 
         font_name = "freesansbold.ttf" 
         font_size = 30
