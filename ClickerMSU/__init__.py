@@ -35,7 +35,7 @@ def set_ru_language() -> None:
 def set_eng_language() -> None:
     """Set language to English."""
     global lang_eng
-    lang_ru.install()
+    lang_eng.install()
 
 
 """ Play screen:
