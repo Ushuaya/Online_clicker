@@ -9,8 +9,23 @@ from . import input
 from . import insertion_deleting_sqlite
 from .Option import Option_switchable, Option_slider
 from os import path, listdir
+from typing import Callable
 import threading
 import sys
+import gettext
+
+# Standard variant
+#translation = gettext.translation("Clicker", path.dirname(__file__), fallback=True)
+#_  = translation.gettext 
+#ngettext = translation.ngettext
+
+# Costyl variant 
+lang_def = gettext.translation("Clicker", path.dirname(__file__), fallback=True)
+set_default_language = lambda: lang_def.install()
+lang_ru = gettext.translation("Clicker", path.dirname(__file__), languages=["ru"], fallback=True)
+set_ru_language = lambda: lang_ru.install()
+lang_eng = gettext.translation("Clicker", path.dirname(__file__), languages=["en"], fallback=True)
+set_eng_language = lambda: lang_eng.install()
 
 
 """ Play screen:
@@ -45,9 +60,24 @@ f_stop = None
 LANGUAGES = ["Default", "English", "Russian", ]
 RESOLUTIONS = ["1024x768", "640x480", "1280x720", "1920x1080", ]
 
-LANG_TO_LOC = {"English": "en_US.UTF-8",
-               "Russian": "ru_RU.UTF-8",
-               "Default": "", }
+#LANG_TO_LOC = {"English": "en_US.UTF-8",
+#               "Russian": "ru_RU.UTF-8", 
+#               "Default": "", }
+
+LANG_TO_LOC = {"English": set_eng_language,
+               "Russian": set_ru_language,
+               "Default": set_default_language,}
+
+
+
+#def change_translation() -> Callable:
+#    """Change translation function."""
+#    global translation, _
+#    translation = gettext.translation("Clicker", path.dirname(__file__), fallback=True)
+#    _  = translation.gettext
+#    print(_("TestHello"))
+#    return _
+
 
 
 class ImageUploader():
@@ -211,11 +241,11 @@ class Game():
         bckgrnd_im = imageSaver.uploadImage('Game_back.jpeg', (DISPLAY_WIDTH, DISPLAY_HEIGHT))
         button_home = imageSaver.uploadImage("home_button.png", (0.10 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT))
 
-        UPGRADE_BUTTON = Button(button_1, pos=(0.20 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT),
-                                text_input="Upgrade clicker: {}".format(self.costUpgrade), font_size=20,
+        UPGRADE_BUTTON = Button(button_1, pos=(0.20 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
+                                text_input=_("Upgrade clicker: {}").format(self.costUpgrade), font_size=20, 
                                 hovering_color=GREEN)
-        AUTOMINER_BUTTON = Button(button_1, pos=(0.80 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT),
-                                  text_input="Upgrade autominer: {}".format(self.costAutominer), font_size=20,
+        AUTOMINER_BUTTON = Button(button_1, pos=(0.80 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), 
+                                  text_input=_("Upgrade autominer: {}").format(self.costAutominer), font_size=20, 
                                   hovering_color=GREEN)
         HOME_BUTTON = Button(button_home, (0.85 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT), "")
 
@@ -242,7 +272,6 @@ class Game():
 
                 # Here we choose the right action depending on the cursor click place
                 elif event.type == pg.MOUSEBUTTONDOWN:
-                    # MOUSE_POS = pg.mouse.get_pos()
                     # if click for score
                     if MOUSE_POS[0] >= DISPLAY_WIDTH * 0.42 and MOUSE_POS[1] >= DISPLAY_HEIGHT * 0.42 and\
                        MOUSE_POS[0] <= DISPLAY_WIDTH * 0.545 and MOUSE_POS[1] <= DISPLAY_HEIGHT * 0.59:
@@ -255,7 +284,7 @@ class Game():
                             self.coins = self.coins - self.costUpgrade
                             self.mong = self.mong * 1.1
                             self.costUpgrade = round(self.costUpgrade * 1.5, 0)
-                            UPGRADE_BUTTON.changeText("Upgrade clicker: {}".format(self.costUpgrade))
+                            UPGRADE_BUTTON.changeText(_("Upgrade clicker: {}").format(self.costUpgrade))
 
                     # if click for autominer
                     elif AUTOMINER_BUTTON.checkForInput(MOUSE_POS):
@@ -263,8 +292,8 @@ class Game():
                             self.coins = self.coins - self.costAutominer
                             self.autog = self.autog + 0.5
                             self.costAutominer = round(self.costAutominer * 1.5, 0)
-                            AUTOMINER_BUTTON.changeText("Upgrade autominer: {}".format(self.costAutominer))
-
+                            AUTOMINER_BUTTON.changeText(_("Upgrade autominer: {}").format(self.costAutominer))
+                    
                     # if click for home
                     elif HOME_BUTTON.checkForInput(MOUSE_POS):
                         return
@@ -279,38 +308,32 @@ class Game():
             Drawer.dispaylBackgroundButton(pg.mouse.get_pos(), self.gameDisplay, button_1, butn_bckrnd)
             self.gameDisplay.blit(currLogo, (DISPLAY_WIDTH * 0.42, DISPLAY_HEIGHT * 0.42))
 
-            Drawer.drawText("ВМИК lif(v)e", BLACK, LIGHT_BLUE,
-                            0.5 * DISPLAY_WIDTH, 0.12 * DISPLAY_HEIGHT, 50, screen=self.gameDisplay)
-            Drawer.drawText("You have: " + str(f'{self.coins:.2f}') + " coins", BLACK, LIGHT_BLUE,
-                            0.15 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT, 20, screen=self.gameDisplay)
-
-            # Drawer.drawText("Version: " + self.ver, BLACK, LIGHT_BLUE,
-            # 0.85 * DISPLAY_WIDTH, 0.06 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
+            Drawer.drawText("ВМИК lif(v)e", BLACK, LIGHT_BLUE, 
+                            0.5 * DISPLAY_WIDTH, 0.12 * DISPLAY_HEIGHT, 50, screen = self.gameDisplay)
+            Drawer.drawText(_("You have {:.2f} coins").format(self.coins), BLACK, LIGHT_BLUE, 
+                            0.15 * DISPLAY_WIDTH, 0.10 * DISPLAY_HEIGHT, 20, screen = self.gameDisplay)
 
             # updating
             pg.display.flip()
         return
 
     def update_locale(self) -> None:
-        """Try to update locals."""
-        new_loc = LANG_TO_LOC[self.language]
-        # print(self.language, new_loc)
-        locale.setlocale(locale.LC_ALL, new_loc)
+#        new_loc = LANG_TO_LOC[self.language]
+#        locale.setlocale(locale.LC_ALL, new_loc)
+        #change_translation()
+        LANG_TO_LOC[self.language]()
         return
 
     def apply_changes(self, **kwargs) -> bool:
         """Apply changes in options."""
-        # restart = False
         restart = True
         if "new_volume" in kwargs:
             self.musicPlayer.setVolume(kwargs["new_volume"] / 100)
             self.volume = kwargs["new_volume"]
         if "new_language" in kwargs:
-            # restart = True
             self.language = kwargs["new_language"]
             self.update_locale()
         if "new_resolution" in kwargs:
-            # restart = True
             global DISPLAY_HEIGHT, DISPLAY_WIDTH
             self.resolution = self.resolution_to_str(kwargs["new_resolution"])
             DISPLAY_WIDTH = kwargs["new_resolution"][0]
@@ -360,28 +383,28 @@ class Game():
 
         font_name = "freesansbold.ttf"
         font_size = 56
-        OPT_TEXT = pg.font.Font(font_name, font_size).render("Options", True, BLACK)
+        OPT_TEXT = pg.font.Font(font_name, font_size).render(_("Options"), True, BLACK)
         OPT_RECT = OPT_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, DISPLAY_HEIGHT * 0.08))
 
-        LANGUAGE_OPTION = Option_switchable("Language", (0.05 * DISPLAY_WIDTH, 0.30 * DISPLAY_HEIGHT),
-                                            panel_green, panel_yellow, button_prev, button_next,
+        LANGUAGE_OPTION = Option_switchable(_("Language"), (0.05 * DISPLAY_WIDTH, 0.30 * DISPLAY_HEIGHT), 
+                                            panel_green, panel_yellow, button_prev, button_next, 
                                             variants=LANGUAGES)
         LANGUAGE_OPTION.set_curr_value(self.language)
-
-        RESOLUTION_OPTION = Option_switchable("Resolution", (0.05 * DISPLAY_WIDTH, 0.50 * DISPLAY_HEIGHT),
-                                              panel_green, panel_yellow, button_prev, button_next,
+        
+        RESOLUTION_OPTION = Option_switchable(_("Resolution"), (0.05 * DISPLAY_WIDTH, 0.50 * DISPLAY_HEIGHT), 
+                                              panel_green, panel_yellow, button_prev, button_next, 
                                               variants=RESOLUTIONS)
         RESOLUTION_OPTION.set_curr_value(self.resolution)
 
-        VOLUME_OPTION = Option_slider(self.gameDisplay, "Volume",
+        VOLUME_OPTION = Option_slider(self.gameDisplay, _("Volume"), 
                                       (0.05 * DISPLAY_WIDTH, 0.70 * DISPLAY_HEIGHT), panel_green,
                                       0, 100, 1, slider_colour=DARK_YELLOW, handle_colour=GOLD,
                                       initial_value=self.volume)
 
-        APPLY_BUTTON = Button(button_apply, (0.30 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), "Apply",
+        APPLY_BUTTON = Button(button_apply, (0.30 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), _("Apply"),
                               font_size=46, hovering_color=LIGHT_BLUE)
-        BACK_BUTTON = Button(button_back, (0.70 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), "Esc: back",
-                             font_size=46, hovering_color=BLUE_GRAY)
+        BACK_BUTTON = Button(button_back, (0.70 * DISPLAY_WIDTH, 0.85 * DISPLAY_HEIGHT), _("Esc: back"),
+                              font_size=46, hovering_color=BLUE_GRAY)        
 
         clock = pg.time.Clock()
         changes = dict()
@@ -440,18 +463,18 @@ class Game():
 
         font_name = "freesansbold.ttf"
         font_size = 80
-        MENU_TEXT = pg.font.Font(font_name, font_size).render("Clicker: MSU edition", True, BLACK)
+        MENU_TEXT = pg.font.Font(font_name, font_size).render(_("Clicker: MSU edition"), True, BLACK)
         MENU_RECT = MENU_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.12 * DISPLAY_HEIGHT))
-
-        PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT),
-                             text_input="PLAY", font_size=48)
-        OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.48 * DISPLAY_HEIGHT),
-                                text_input="OPTIONS", font_size=48)
-        RATING_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.63 * DISPLAY_HEIGHT),
-                               text_input="SAVE & RATING", font_size=36)
-        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH // 2, 0.78 * DISPLAY_HEIGHT),
-                             text_input="QUIT", font_size=48, hovering_color=BLACK)
-
+        
+        PLAY_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.33 * DISPLAY_HEIGHT), 
+                             text_input=_("PLAY"), font_size=48)
+        OPTIONS_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.48 * DISPLAY_HEIGHT), 
+                                text_input=_("OPTIONS"), font_size=48)
+        RATING_BUTTON = Button(button_dark_blue, pos=(DISPLAY_WIDTH // 2, 0.63 * DISPLAY_HEIGHT), 
+                             text_input=_("SAVE & RATING"), font_size=28)
+        QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
+                             text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
+        
         clock = pg.time.Clock()
         while self.running and not self._reset_screen:
             clock.tick(FPS)
@@ -460,8 +483,8 @@ class Game():
             MENU_MOUSE_POS = pg.mouse.get_pos()
             self.gameDisplay.blit(MENU_TEXT, MENU_RECT)
 
-            if self.User is not None:
-                USER_TEXT = pg.font.Font(font_name, 40).render("СURRENT USER: " + self.User, True, WHITE)
+            if self.User != None: 
+                USER_TEXT = pg.font.Font(font_name, 40).render(_("СURRENT USER: {}").format(self.User), True, WHITE)
                 USER_RECT = USER_TEXT.get_rect(center=(DISPLAY_WIDTH // 2, 0.9 * DISPLAY_HEIGHT))
                 self.gameDisplay.blit(USER_TEXT, USER_RECT)
 
@@ -550,7 +573,7 @@ class Game():
         button_red = imageSaver.uploadImage('button_red.png', (0.30 * DISPLAY_WIDTH, 0.125 * DISPLAY_HEIGHT))
 
         QUIT_BUTTON = Button(button_red, pos=(DISPLAY_WIDTH //2, 0.78 * DISPLAY_HEIGHT), 
-                            text_input="QUIT", font_size=48, hovering_color=BLACK)
+                            text_input=_("QUIT"), font_size=48, hovering_color=BLACK)
 
         font_name = "freesansbold.ttf" 
         font_size = 30
