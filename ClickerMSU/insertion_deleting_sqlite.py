@@ -251,7 +251,6 @@ def update_signed(messg, username_in: str = None, coins: int = None) -> None:
         cursor = connect.cursor()
         try:
             cursor.execute("DROP TABLE login_id;")
-            cursor.execute("DELETE FROM login_id WHERE username = (?)", (username_in,))
         except Exception:
             pass
         cursor.execute("CREATE TABLE IF NOT EXISTS login_id (id INTEGER, username TEXT, password TEXT);")
