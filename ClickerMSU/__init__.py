@@ -21,16 +21,19 @@ lang_eng = gettext.translation("Clicker", path.dirname(__file__), languages=["en
 
 
 def set_default_language() -> None:
+    """Set language to default."""
     global lang_def
     lang_def.install()
 
 
 def set_ru_language() -> None:
+    """Set language to Russian."""
     global lang_ru
     lang_ru.install()
 
 
 def set_eng_language() -> None:
+    """Set language to English."""
     global lang_eng
     lang_ru.install()
 
@@ -74,7 +77,7 @@ LANG_TO_LOC = {"English": set_eng_language,
 
 
 class ImageUploader():
-    """Try Image uploader."""
+    """I Image uploader."""
 
     def __init__(self, dir):
         """Try Init image uploader associated with the <dir> directiry."""
