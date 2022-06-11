@@ -716,27 +716,32 @@ class Game():
     def __init__(self) -> None:
         """Start the game."""
         # Setting display
+        self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        # Music
+        self.musicPlayer = MusicUploader('music')
+        self.musicPlayer.playRandomMusic()
+
+        # Ininial values
+        self.running = True
+
+        # Ininial values and default values
+        self.running = True
+        self._changes_applied = False
+        self._reset_screen = True   # initially True but set to False during launch
+        self.language = LANGUAGES[0]
+        self.update_locale()
+        self.resolution = RESOLUTIONS[0]
+        self.volume = int(self.musicPlayer.getVolume() * 100)
+
+        # Check Internet connection
         import urllib
         try:
             urllib.request.urlopen("http://google.com")
-            self.gameDisplay = pg.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-
-            # Music
-            self.musicPlayer = MusicUploader('music')
-            self.musicPlayer.playRandomMusic()
-
-            # Ininial values
-            self.running = True
-
-            # Ininial values and default values
-            self.running = True
-            self._changes_applied = False
-            self._reset_screen = True   # initially True but set to False during launch
-            self.language = LANGUAGES[0]
-            self.update_locale()
-            self.resolution = RESOLUTIONS[0]
-            self.volume = int(self.musicPlayer.getVolume() * 100)
-
+        except IOError:
+            "Google is not available! Internet is broken!"
+            self.internet_error()
+            return
+        else:
             while self._reset_screen:
                 self._reset_screen = False
                 self.main_menu()
