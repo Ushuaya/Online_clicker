@@ -338,6 +338,8 @@ class Game():
     @staticmethod
     def resolution_to_tuple(resol: str) -> tuple[int]:
         """Cast resolution in format 'AxB' to (A, B)."""
+        if not isinstance(resol, str):
+            raise TypeError("Wrong resol type")
         A, x, B = resol.partition('x')
         A = int(A)
         B = int(B)
@@ -348,6 +350,9 @@ class Game():
     @staticmethod
     def resolution_to_str(resol: tuple[int, int]) -> str:
         """Cast resolution in format (A, B) to 'AxB'."""
+        if not (isinstance(resol, tuple) or isinstance(resol, list)) or len(resol) == 0\
+           or not isinstance(resol[0], int):
+            raise TypeError("Wrong resol type")
         return str(resol[0]) + "x" + str(resol[1])
 
     @staticmethod

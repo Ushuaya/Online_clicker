@@ -34,3 +34,10 @@ def task_mo():
             'file_dep': ['po/ru/LC_MESSAGES/Clicker.po'],
             'targets': ['ClickerMSU/ru/LC_MESSAGES/Clicker.mo'],
            }
+
+
+def task_test():
+    """Perform tests."""
+    return {
+            'actions': ['python3 -m unittest -b'],
+           }
