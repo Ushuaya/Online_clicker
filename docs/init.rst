@@ -1,6 +1,6 @@
 Docs for __init__.py file
 =========================
 
-.. automodule:: clickermsu
+.. automodule:: ClickerMSU
    :members:
    :special-members:

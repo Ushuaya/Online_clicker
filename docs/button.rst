@@ -1,6 +1,6 @@
 Docs for Button.py
 ==================
 
-.. automodule:: clickermsu.Button
+.. automodule:: ClickerMSU.Button
    :members:
    :special-members:

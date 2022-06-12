@@ -1,6 +1,6 @@
 Docs for input.py
 =================
 
-.. automodule:: clickermsu.input
+.. automodule:: ClickerMSU.input
    :members:
    :special-members:
