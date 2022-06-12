@@ -7,3 +7,4 @@ restricted_area.py
 *.db
 _build
 _build/
+build/

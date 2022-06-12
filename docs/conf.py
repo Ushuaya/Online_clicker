@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'clicker'
-copyright = '2022, Dmitry Hasanov & Ivan Ushakov'
+copyright = '2022, Dmitry Khasanov & Ivan Ushakov'
 author = 'Dmitry Khasanov & Ivan Ushakov'
 
 # The full version, including alpha/beta/rc tags
