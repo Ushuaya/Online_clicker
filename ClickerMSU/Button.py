@@ -82,7 +82,7 @@ class Button:
 
     def changeColor(self, position: tuple[int], screen: Surface = None) -> None:
         """Change button's text color if position in button's range.
-        
+
         :param position: position of the mouse
         :type position: tuple[int]
 
@@ -105,7 +105,7 @@ class Button:
 
     def get_rect(self) -> Rect:
         """Try Returns rectangle square of Button.
-        
+
         :return: pg.Rect
         """
         return self.rect

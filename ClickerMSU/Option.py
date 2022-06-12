@@ -31,7 +31,7 @@ class Option:
 
         :param name_pic: picture for pannel with option_name
         :type name_pic: pg.Surface
-        
+
         :return: None
         """
         self.x_pos = pos[0]
@@ -50,7 +50,7 @@ class Option:
 
         :param font_size: new size, if None - remains the same
         :type font_size: int
-        
+
         :return: None
         """
         if font_name:
@@ -135,7 +135,7 @@ class Option_switchable(Option):
 
     def update(self, screen: pg.Surface) -> None:
         """Update options images on screen.
-        
+
         :param screen: screen where to show
         :type screen: pg.Surface
 
@@ -152,7 +152,7 @@ class Option_switchable(Option):
 
     def check_for_switch_prev(self, position: tuple[int]) -> bool:
         """Check if possition corresponds to switch prev button.
-        
+
         :param position: sposition of options' click
         :type position: tuple[int]
 
@@ -162,7 +162,7 @@ class Option_switchable(Option):
 
     def check_for_switch_next(self, position: tuple[int]) -> bool:
         """Check if possition corresponds to switch next button.
-        
+
         :param position: sposition of options' click
         :type position: tuple[int]
 
@@ -181,7 +181,7 @@ class Option_switchable(Option):
 
     def switch_prev(self) -> None:
         """Switch current variant to previous.
-        
+
         :return: bool
         """
         self.variants.rotate(1)
@@ -206,7 +206,7 @@ class Option_switchable(Option):
 
     def set_curr_value(self, value: str) -> None:
         """Set current value for option.
-        
+
         :param value: value ti set
         :type value: str
 
@@ -262,7 +262,7 @@ class Option_slider(Option):
     def _create_slider(self, display: pg.Surface, left: int = 0, right: int = 100,
                        step: int = 1, **kwargs) -> Slider:
         """Create slider.
-        
+
         :param display: Surface to draw on
         :type display: pg.Surface
 
@@ -298,7 +298,7 @@ class Option_slider(Option):
 
     def _create_output(self, display: pg.Surface, **kwargs) -> TextBox:
         """Create output for slider.
-        
+
         :param display: Surface to draw on
         :type display: pg.Surface
 
@@ -317,7 +317,7 @@ class Option_slider(Option):
     def _make_gui(self, display: pg.Surface, left: int = 0, right: int = 100,
                   step: int = 1, **kwargs) -> None:
         """Make gui for options.
-        
+
         :param display: Surface to draw on
         :type display: pg.Surface
 
@@ -341,7 +341,7 @@ class Option_slider(Option):
 
     def update(self, screen: pg.Surface) -> None:
         """Update options images on screen.
-        
+
         :param screen: screen to draw on
         :type screen: pg.Surface
 
@@ -354,14 +354,14 @@ class Option_slider(Option):
 
     def get_value(self) -> int:
         """Get slider's value.
-        
+
         :return: int
         """
         return self.slider.getValue()
 
     def set_value(self, val: int) -> None:
         """Set value for slider.
-        
+
         :param val: value of the slider to set
         :type val: int
 
@@ -372,7 +372,8 @@ class Option_slider(Option):
 
     def update_slider(self, events: list[pg.event.Event]) -> None:
         """Update slider.
-        
+
+
         :param events: events in option (any)
         :type events: list[pg.event.Event]
 

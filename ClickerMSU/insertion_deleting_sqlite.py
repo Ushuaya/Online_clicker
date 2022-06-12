@@ -23,7 +23,7 @@ global_file_id = "BQACAgIAAxkDAAIBrmKbrXkKo_0d3Nbo-Cmr1Zpy0_fWAALzGwACYDDgSFN_tb
 
 def get_data() -> None:
     """Get users' data from server.
-    
+
     :return: None
     """
     # Very strange procedure, but it is necessary, in order to get new
@@ -61,7 +61,7 @@ def handle_files(message: str) -> None:
 
     :param message: recived message.
     :type message: str
-    
+
     :return: None
     """
     #  """Debugging function.
@@ -72,7 +72,7 @@ def handle_files(message: str) -> None:
     # :type screen_f:  pg.Surface
     # :param button_bckgrnd_f: button background to draw
     # :type button_bckgrnd_f: pg.Surface
-    
+
     # :return: None
     # """
     document_id = message.document.file_id
@@ -84,10 +84,10 @@ def handle_files(message: str) -> None:
 @bot.message_handler(commands=["update"])
 def update_data(messg):
     """Try to updtae users' data on server.
-    
+
     :param message: recived message.
     :type message: str
-    
+
     :return: None
     """
     # server case
@@ -122,10 +122,10 @@ def update_data(messg):
 @bot.message_handler(commands=["save"])
 def save_data(messg):
     """Use this function for initial message for bot-server.
-    
+
     :param message: recived message.
     :type message: str
-    
+
     :return: None
     """
     # server case
@@ -179,7 +179,7 @@ def register(messg, username_in: str = None, password_in: str = None, coins: int
     :type password_in: str
     :param coins:  user coins
     :type coins: int
-    
+
     :return: list
     """
     # server case
@@ -242,7 +242,7 @@ def update_signed(messg, username_in: str = None, coins: int = None) -> None:
     :type password_in: str
     :param coins: user coins
     :type coins: int
-    
+
     :return: None
     """
     # server case
@@ -289,7 +289,7 @@ def sighin(messg, username_in: str = None, password_in: str = None, coins: int =
     :type password_in: str
     :param coins:  user coins
     :type coins: int
-    
+
     :return: list
     """
     # server case
@@ -355,7 +355,7 @@ def start(messg: str) -> None:
 
     :param messg:  user messages
     :type messg: str
-    
+
     :return: None
     """
     bot.send_message(messg.chat.id, "Finding...")
@@ -363,10 +363,10 @@ def start(messg: str) -> None:
 
 def listener(messages: str) -> None:
     """Try to DEBUG.
-    
+
     :param messages:  user messages
     :type messages: str
-    
+
     :return: None
     """
     print(type(messages[0].de_json))
@@ -375,10 +375,10 @@ def listener(messages: str) -> None:
 @bot.message_handler(commands=["delete"])
 def delete(messg: str) -> None:
     """Try to delete user in database.
-    
+
     :param messg:  user messages
     :type messg: str
-    
+
     :return: None
     """
     bot.send_message(messg.chat.id, "Deleting")

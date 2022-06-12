@@ -37,7 +37,7 @@ class InputBox:
 
         :param text:  user's text
         :type text: str
-        
+
         :return: None
         """
         self.rect = pg.Rect(x, y, w, h)
@@ -50,10 +50,10 @@ class InputBox:
 
     def handle_event(self, event: pg.event) -> None:
         """Toggle action of input box.
-        
+
         :param event:  any event in game
         :type event: pg.event
-        
+
         :return: None
         """
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -86,7 +86,7 @@ class InputBox:
 
     def draw(self, screen: pg.Surface) -> None:
         """Draw input box.
-        
+
         :return: None
         """
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
@@ -101,7 +101,7 @@ def main_c(coins=None, d_w: int = 1024, d_h: int = 768) -> list:
 
     :param d_h:  height
     :type d_h: int
-    
+
     :return: list
     """
     imageSaver = ImageUploader('images')

@@ -115,12 +115,12 @@ class MusicUploader():
 
     def __init__(self, dir) -> None:
         """Init music uploader associated with <dir> directiry.
-        
+
         :param name: name of music, that will be implemented on next step.
         :type name: str
 
         :return: None
-        """        
+        """
         self.sound_dir = path.join(path.dirname(__file__), dir)
 
     def uploadMusic(self, name: str) -> None:
@@ -204,7 +204,7 @@ class Drawing():
 
     def newImageAfterClick(self, logos: tuple) -> None:
         """Change of the main-click logo. There is random probabilty of changing the logo.
-        
+
         :param logos:  new logo to show
         :type logos: tuple
 
@@ -236,7 +236,6 @@ class Drawing():
 
 class ShiftingBackgoungnd():
     """Create background, move it an each tick on one pixel, and other changes."""
-    
 
     cycleBack = 0
 
@@ -386,10 +385,8 @@ class Game():
 
         :return: None
         """
-
         LANG_TO_LOC[self.language]()
         return
-
 
     def apply_changes(self, **kwargs) -> bool:
         """Apply changes in options.
@@ -654,9 +651,8 @@ class Game():
 
         :param username_: user's name.
         :type username_: str
-       
-        :return: None
 
+        :return: None
         """
         if self.User is not None:
             print("Updation")
@@ -750,4 +746,3 @@ class Game():
                 self.f_stop.set()
                 self.f_stop = None
             return
-
