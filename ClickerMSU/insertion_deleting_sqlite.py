@@ -21,8 +21,11 @@ global_data_message = 430
 global_file_id = "BQACAgIAAxkDAAIBrmKbrXkKo_0d3Nbo-Cmr1Zpy0_fWAALzGwACYDDgSFN_tbcimLj3JAQ"
 
 
-def get_data():
-    """Get users' data from server."""
+def get_data() -> None:
+    """Get users' data from server.
+
+    :return: None
+    """
     # Very strange procedure, but it is necessary, in order to get new
     # file id from message (API doesn't support message return by its
     # id withount such manipulations)
@@ -53,8 +56,25 @@ def get_data():
 
 
 @bot.message_handler(content_types=["document", "video", "audio"])
-def handle_files(message):
-    """Debugging function."""
+def handle_files(message: str) -> None:
+    """Debugging function.
+
+    :param message: recived message.
+    :type message: str
+
+    :return: None
+    """
+    #  """Debugging function.
+
+    # :param message: recived message.
+    # :type message: str
+    # :param screen_f:  screen where to draw
+    # :type screen_f:  pg.Surface
+    # :param button_bckgrnd_f: button background to draw
+    # :type button_bckgrnd_f: pg.Surface
+
+    # :return: None
+    # """
     document_id = message.document.file_id
     file_info = bot.get_file(document_id)
     print(f'http://api.telegram.org/file/bot{token_crypto}/{file_info.file_path}')
@@ -63,7 +83,13 @@ def handle_files(message):
 
 @bot.message_handler(commands=["update"])
 def update_data(messg):
-    """Try to updtae users' data on server."""
+    """Try to updtae users' data on server.
+
+    :param message: recived message.
+    :type message: str
+
+    :return: None
+    """
     # server case
     # connect = sqlite3.connect('users.db')
     # cursor = connect.cursor()
@@ -95,7 +121,13 @@ def update_data(messg):
 
 @bot.message_handler(commands=["save"])
 def save_data(messg):
-    """Use this function for initial message for bot-server."""
+    """Use this function for initial message for bot-server.
+
+    :param message: recived message.
+    :type message: str
+
+    :return: None
+    """
     # server case
     # connect = sqlite3.connect('users.db')
     # cursor = connect.cursor()
@@ -141,14 +173,14 @@ def save_data(messg):
 def register(messg, username_in: str = None, password_in: str = None, coins: int = None) -> list:
     """Try to registrate new user in database.
 
-    params:
-        username_in - user name
-        password_in - user password
-        coins - user coins
+    :param username_in:  user name
+    :type username_in: str
+    :param password_in:  user password
+    :type password_in: str
+    :param coins:  user coins
+    :type coins: int
 
-    returns:
-        top 10 table
-        user's place
+    :return: list
     """
     # server case
     connect = sqlite3.connect('users.db')
@@ -204,10 +236,14 @@ def register(messg, username_in: str = None, password_in: str = None, coins: int
 def update_signed(messg, username_in: str = None, coins: int = None) -> None:
     """Try to update data of sighned user.
 
-    params:
-        username_in - user name
-        password_in - user password
-        coins - user coins
+    :param username_in:  user name
+    :type username_in: str
+    :param password_in:  user password
+    :type password_in: str
+    :param coins: user coins
+    :type coins: int
+
+    :return: None
     """
     # server case
     try:
@@ -247,15 +283,14 @@ def update_signed(messg, username_in: str = None, coins: int = None) -> None:
 def sighin(messg, username_in: str = None, password_in: str = None, coins: int = None) -> list:
     """Try to log in user in database.
 
-    params:
-        username_in - user name
-        password_in - user password
-        coins - user coins
+    :param username_in:  user name
+    :type username_in: str
+    :param password_in:  user password
+    :type password_in: str
+    :param coins:  user coins
+    :type coins: int
 
-    returns:
-        top 10 table
-        user's place
-        score to implement
+    :return: list
     """
     # server case
     connect = sqlite3.connect('users.db')
@@ -292,7 +327,7 @@ def sighin(messg, username_in: str = None, password_in: str = None, coins: int =
             # Вы успешно вошли
             cursor.execute("SELECT id FROM login_id WHERE username = (?)", (username_in,))
             score = cursor.fetchone()
-            score_out = max(score[0], coins)
+            score_out = max(score[0], 0)
             print(score_out)
 
             # updating
@@ -315,19 +350,37 @@ def sighin(messg, username_in: str = None, password_in: str = None, coins: int =
 
 
 @bot.message_handler(commands=["find"])
-def start(messg):
-    """Try to find message from user(DEBUG)."""
+def start(messg: str) -> None:
+    """Try to find message from user(DEBUG).
+
+    :param messg:  user messages
+    :type messg: str
+
+    :return: None
+    """
     bot.send_message(messg.chat.id, "Finding...")
 
 
-def listener(messages):
-    """Try to DEBUG."""
+def listener(messages: str) -> None:
+    """Try to DEBUG.
+
+    :param messages:  user messages
+    :type messages: str
+
+    :return: None
+    """
     print(type(messages[0].de_json))
 
 
 @bot.message_handler(commands=["delete"])
-def delete(messg):
-    """Try to delete user in database."""
+def delete(messg: str) -> None:
+    """Try to delete user in database.
+
+    :param messg:  user messages
+    :type messg: str
+
+    :return: None
+    """
     bot.send_message(messg.chat.id, "Deleting")
     connect = sqlite3.connect('users.db')
     cursor = connect.cursor()

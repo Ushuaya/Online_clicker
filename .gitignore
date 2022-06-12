@@ -1,4 +1,10 @@
 .DS_Store
+__pycache__/
+__pycache__
+restricted_area.py
 *.pot
 *.mo
 *.db
+_build
+_build/
+build/

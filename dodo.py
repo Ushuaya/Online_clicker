@@ -41,3 +41,10 @@ def task_test():
     return {
             'actions': ['python3 -m unittest -b'],
            }
+
+
+def task_html():
+    """Make HTML documentationi."""
+    return {
+            'actions': ['sphinx-build -M html docs build'],
+           }
