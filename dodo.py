@@ -3,8 +3,6 @@
 import glob
 from doit.tools import create_folder
 
-DOIT_CONFIG = {'default_tasks': ['all']}
-
 
 def task_pot():
     """Re-create .pot ."""
@@ -47,4 +45,58 @@ def task_html():
     """Make HTML documentationi."""
     return {
             'actions': ['sphinx-build -M html docs build'],
+           }
+
+def task_gitclean():
+    """Clean all generated files not tracked by GIT."""
+    return {
+            'actions': ['git clean -xdf'],
+           }
+
+def task_sdist():
+    """Create source distribution."""
+    return {
+            'actions': ['python -m build -s'],
+            'task_dep': ['gitclean'],
+           }
+
+def task_wheel():
+    """Create binary wheel distribution."""
+    return {
+            'actions': ['python -m build -w'],
+            'task_dep': ['mo'],
+           }
+
+def task_app():
+    """Run application."""
+    return {
+            'actions': ['python -m ClickerMSU'],
+            'task_dep': ['mo'],
+           }
+
+def task_style():
+    """Check style with flake8."""
+    return {
+            'actions': ['flake8 ClickerMSU']
+           }
+
+def task_docstyle():
+    """Check docstrings with pydocstyle."""
+    return {
+            'actions': ['pydocstyle ClickerMSU']
+           }
+
+def task_check():
+    """Perform all checks."""
+    return {
+            'actions': None,
+            'task_dep': ['style', 'docstyle', 'test']
+           }
+
+def task_publish():
+    """Publish distros on test.pypi.org"""
+    return {
+            'task_dep': ['sdist', 'wheel'],
+            'actions': ['twine upload -u __token__ --repository testpypi dist/*'],
+            'verbosity': 2
            }

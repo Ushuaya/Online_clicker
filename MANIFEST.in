@@ -1,0 +1,11 @@
+recursive-include po *.po
+recursive-include tests *
+recursive-include docs *
+include *.md
+include requirements.txt
+include devreq.txt
+include .flake8
+include .gitignore
+include dodo.py
+include setup.cfg
+include pyproject.toml
