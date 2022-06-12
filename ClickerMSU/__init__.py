@@ -751,7 +751,3 @@ class Game():
                 self.f_stop = None
             return
 
-        except IOError:
-
-            self.internet_error()
-            return

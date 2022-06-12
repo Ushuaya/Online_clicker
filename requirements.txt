@@ -1,2 +1,4 @@
 pygame>=2.1.2
-pygame-widgets
+pygame-widgets>=1.0.0
+Babel>=2.10.1
+pyTelegramBotAPI>=4.5.1

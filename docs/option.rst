@@ -1,6 +1,6 @@
 Docs for Option.py
 ==================
 
-.. automodule:: clickermsu.Option
+.. automodule:: ClickerMSU.Option
    :members:
    :special-members:
