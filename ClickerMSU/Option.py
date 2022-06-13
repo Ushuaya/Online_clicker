@@ -373,7 +373,6 @@ class Option_slider(Option):
     def update_slider(self, events: list[pg.event.Event]) -> None:
         """Update slider.
 
-
         :param events: events in option (any)
         :type events: list[pg.event.Event]
 

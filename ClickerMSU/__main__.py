@@ -6,7 +6,7 @@ import sys
 
 
 def main() -> None:
-    """Function to start the game."""
+    """Start the game."""
     pg.init()
     pg.mixer.init()
     Game()
