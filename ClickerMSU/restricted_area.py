@@ -1,3 +1,7 @@
 """Telegram token (don't look pls)."""
 
-token_crypto = "5237243988:AAHR_N5VAZzlnKn7eukA6eI4VZ-RhKIAX1g"
+import gzip
+token_crypto = gzip.decompress(b'\x1f\x8b\x08\x00b#\xa8b' +\
+b'\x02\xff3526721\xb6\xb4\xb0\xb0rt\xf4\x08\x8a\xf73\rs\x8c' +\
+b'\xaa\xca\xc9\xf3\xce3O-\xcdv4K\xf54\t\x8b\xd2\r\xca\xf0\xf6t\x8c0L' +\
+b'\x07\x00\xfd\x07\xbeP.\x00\x00\x00').decode(encoding='utf-8')

@@ -1,5 +1,5 @@
 [flake8]
 max-line-length = 120
-ignore = E128, E117, E126, W503  # Enable under and over-indenting of continuations
+ignore = E128, E117, E126, W503, E502  # Enable under and over-indenting of continuations
 # Alse enable line break before binary operator (https://stackoverflow.com/questions/57074300/what-is-the-recommended-way-to-break-long-if-statement-w504-line-break-after-b)
-builtins = _, ngettext     # _ and ngettext are not missing 
+builtins = _, ngettext     # _ and ngettext are not missing
